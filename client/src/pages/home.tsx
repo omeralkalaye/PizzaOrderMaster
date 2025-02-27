@@ -13,6 +13,9 @@ export default function Home() {
           backgroundColor: 'rgba(0, 0, 0, 0.5)'
         }}
       >
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+          <img src="/attached_assets/1.png" alt="פיצה פצץ קדימה" className="h-32 w-auto" />
+        </div>
         <div className="text-center text-white z-10 px-4">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             פיצה טעימה עד הבית

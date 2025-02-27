@@ -33,7 +33,9 @@ export function Nav() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
-                <a className="text-2xl font-bold">🍕 פיצה שלי</a>
+                <a>
+                  <img src="/attached_assets/1.png" alt="פיצה פצץ קדימה" className="h-12 w-auto" />
+                </a>
               </Link>
             </div>
           </div>
