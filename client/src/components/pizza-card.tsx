@@ -248,13 +248,12 @@ export function PizzaCard({
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
               <DialogHeader>
-                <DialogTitle>התאם את {pizza.name} לטעמך</DialogTitle>
+                <DialogTitle className="text-right">התאם את {pizza.name} לטעמך</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4">
                 {/* בחירת כמות מגשים */}
                 <div className="flex items-center justify-between">
-                  <Label>כמות מגשים</Label>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -272,6 +271,7 @@ export function PizzaCard({
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
+                  <Label>כמות מגשים</Label>
                 </div>
 
                 {/* בחירת מגש */}
@@ -289,31 +289,31 @@ export function PizzaCard({
                       {/* בחירת רוטב וגבינה */}
                       <div className="space-y-4 mb-4">
                         <div className="flex items-center justify-between">
-                          <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                           <Switch
                             id={`cream-sauce-${pizzaIndex}`}
                             checked={pizzaConfig.isCreamSauce}
                             onCheckedChange={(checked) => updatePizzaSauce(pizzaIndex, checked)}
                           />
+                          <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                         </div>
                         <div className="flex items-center justify-between">
-                          <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
                           <Switch
                             id={`vegan-cheese-${pizzaIndex}`}
                             checked={pizzaConfig.isVeganCheese}
                             onCheckedChange={(checked) => updatePizzaCheese(pizzaIndex, checked)}
                           />
+                          <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
                         </div>
                       </div>
 
                       {/* בחירת פריסת תוספות */}
                       <div className="mb-4">
-                        <label className="text-sm font-medium mb-2 block">בחר פריסת תוספות</label>
+                        <label className="text-sm font-medium mb-2 block text-right">בחר פריסת תוספות</label>
                         <Select
                           value={pizzaConfig.layout}
                           onValueChange={(value: ToppingLayout) => updatePizzaLayout(pizzaIndex, value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="text-right">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -330,8 +330,8 @@ export function PizzaCard({
                           {Array.from({ length: sections }, (_, i) => (
                             <TabsTrigger key={i} value={i.toString()}>
                               {pizzaConfig.layout === "full" ? "תוספות" :
-                                pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
-                                `רבע ${i + 1}`}
+                               pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
+                               `רבע ${i + 1}`}
                             </TabsTrigger>
                           ))}
                         </TabsList>
@@ -347,12 +347,12 @@ export function PizzaCard({
                                   <Button
                                     key={topping.id}
                                     variant={isSelected ? "secondary" : "outline"}
-                                    className="justify-start"
+                                    className="justify-end"
                                     onClick={() => handleToppingToggle(sectionIndex, topping.id)}
                                     disabled={!isSelected && !canSelect}
                                   >
-                                    {isSelected && <CheckCircle2 className="w-4 h-4 mr-2" />}
                                     {topping.name} (₪{(topping.price / 100).toFixed(2)})
+                                    {isSelected && <CheckCircle2 className="w-4 h-4 ml-2" />}
                                   </Button>
                                 );
                               })}
@@ -363,8 +363,8 @@ export function PizzaCard({
 
                       <div className="mt-4 p-4 border rounded-lg">
                         <div className="flex justify-between text-lg">
-                          <span>מחיר למגש:</span>
                           <span>₪{(calculatePizzaPrice(pizzaConfig) / 100).toFixed(2)}</span>
+                          <span>:מחיר למגש</span>
                         </div>
                       </div>
                     </TabsContent>
@@ -374,8 +374,8 @@ export function PizzaCard({
 
               <div className="mt-4 p-4 border rounded-lg">
                 <div className="flex justify-between text-lg font-bold">
-                  <span>סה"כ לתשלום:</span>
                   <span>₪{(calculateTotalPrice() / 100).toFixed(2)}</span>
+                  <span>:סה"כ לתשלום</span>
                 </div>
               </div>
 
