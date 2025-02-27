@@ -29,26 +29,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2, Minus, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {CartItem} from "@/types/cart";
+
 
 interface PizzaCardProps {
   pizza: Pizza;
   isAdmin?: boolean;
   onEdit?: (pizza: Pizza) => void;
   defaultSize?: PizzaSize;
+  existingItem?: CartItem; // הוספת prop חדש
+  onUpdate?: (updatedItem: CartItem) => void; // הוספת prop חדש
 }
 
 const CREAM_SAUCE_PRICE = 500; // 5₪ for cream sauce
 
-export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCardProps) {
+export function PizzaCard({ 
+  pizza, 
+  isAdmin, 
+  onEdit, 
+  defaultSize = "M",
+  existingItem,
+  onUpdate 
+}: PizzaCardProps) {
   const { dispatch } = useCart();
-  const [size] = useState<PizzaSize>(defaultSize);
-  const [quantity, setQuantity] = useState(1); // כמות מגשים
+  const [size] = useState<PizzaSize>(existingItem?.size || defaultSize);
+  const [quantity, setQuantity] = useState(existingItem?.quantity || 1);
   const [selectedPizzas, setSelectedPizzas] = useState<Array<{
     layout: ToppingLayout;
     sections: number[][];
     isCreamSauce: boolean;
     isVeganCheese: boolean;
-  }>>([{
+  }>>(existingItem ? [{
+    layout: existingItem.toppingLayout.layout,
+    sections: existingItem.toppingLayout.sections,
+    isCreamSauce: existingItem.isCreamSauce || false,
+    isVeganCheese: existingItem.isVeganCheese || false,
+  }] : [{
     layout: "full",
     sections: [[]],
     isCreamSauce: false,
@@ -150,23 +166,39 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
   };
 
   const handleAddToCart = () => {
-    selectedPizzas.forEach((pizzaConfig) => {
-      dispatch({
-        type: "ADD_ITEM",
-        payload: {
-          pizzaId: pizza.id,
-          pizza,
-          size,
-          quantity: 1,
-          toppingLayout: {
-            layout: pizzaConfig.layout,
-            sections: pizzaConfig.sections
-          },
-          isCreamSauce: pizzaConfig.isCreamSauce,
-          isVeganCheese: pizzaConfig.isVeganCheese,
+    if (existingItem && onUpdate) {
+      // אם זה עדכון של פריט קיים
+      onUpdate({
+        ...existingItem,
+        quantity: quantity,
+        size: size,
+        toppingLayout: {
+          layout: selectedPizzas[0].layout,
+          sections: selectedPizzas[0].sections
         },
+        isCreamSauce: selectedPizzas[0].isCreamSauce,
+        isVeganCheese: selectedPizzas[0].isVeganCheese,
       });
-    });
+    } else {
+      // אם זה פריט חדש
+      selectedPizzas.forEach((pizzaConfig) => {
+        dispatch({
+          type: "ADD_ITEM",
+          payload: {
+            pizzaId: pizza.id,
+            pizza,
+            size,
+            quantity: quantity,
+            toppingLayout: {
+              layout: pizzaConfig.layout,
+              sections: pizzaConfig.sections
+            },
+            isCreamSauce: pizzaConfig.isCreamSauce,
+            isVeganCheese: pizzaConfig.isVeganCheese,
+          },
+        });
+      });
+    }
     setIsDialogOpen(false);
     setQuantity(1);
     setSelectedPizzas([{
@@ -348,7 +380,7 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
               </div>
 
               <Button onClick={handleAddToCart} className="w-full mt-4">
-                הוסף לסל
+                {existingItem ? "עדכן פריט" : "הוסף לסל"}
               </Button>
             </DialogContent>
           </Dialog>

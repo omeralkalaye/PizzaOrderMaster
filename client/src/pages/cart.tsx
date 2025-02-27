@@ -10,6 +10,10 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useState } from 'react';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { PizzaCard, CartItem } from "@/components/pizza-card";
+
 
 const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
@@ -23,6 +27,7 @@ export default function Cart() {
   const { state: { items }, dispatch } = useCart();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const [editingItem, setEditingItem] = useState<CartItem | null>(null);
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -80,6 +85,15 @@ export default function Cart() {
     orderMutation.mutate(data);
   };
 
+  const handleUpdateItem = (updatedItem: CartItem) => {
+    dispatch({ type: "REMOVE_ITEM", payload: updatedItem.pizzaId });
+    dispatch({ type: "ADD_ITEM", payload: updatedItem });
+    setEditingItem(null);
+    toast({
+      title: "הפריט עודכן בהצלחה",
+    });
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">סל הקניות שלך</h1>
@@ -100,8 +114,11 @@ export default function Cart() {
                 const hasVeganCheese = item.isVeganCheese;
 
                 return (
-                  <div key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`} 
-                       className="flex items-center justify-between p-4 border rounded-lg">
+                  <div 
+                    key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`}
+                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-accent/5"
+                    onClick={() => setEditingItem(item)}
+                  >
                     <div>
                       <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
                       {hasSpecialSauce && (
@@ -123,10 +140,13 @@ export default function Cart() {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => dispatch({
-                          type: "UPDATE_QUANTITY",
-                          payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
-                        })}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({
+                            type: "UPDATE_QUANTITY",
+                            payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
+                          });
+                        }}
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
@@ -134,17 +154,23 @@ export default function Cart() {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => dispatch({
-                          type: "UPDATE_QUANTITY",
-                          payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
-                        })}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({
+                            type: "UPDATE_QUANTITY",
+                            payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
+                          });
+                        }}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="destructive"
                         size="icon"
-                        onClick={() => dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId })}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId });
+                        }}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -153,6 +179,20 @@ export default function Cart() {
                 );
               })}
             </div>
+
+            {editingItem && (
+              <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
+                  <PizzaCard
+                    pizza={editingItem.pizza}
+                    defaultSize={editingItem.size}
+                    existingItem={editingItem}
+                    onUpdate={handleUpdateItem}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
                 <span>סה"כ לתשלום:</span>

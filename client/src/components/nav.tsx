@@ -74,7 +74,7 @@ export function Nav() {
                 <Button variant="outline" className="relative bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black">
                   <ShoppingCart className="h-5 w-5" />
                   {itemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
                       {itemCount}
                     </span>
                   )}
@@ -88,10 +88,10 @@ export function Nav() {
             {/* כפתור סל קניות למובייל */}
             {!isAdmin && (
               <Link href="/cart">
-                <Button variant="outline" size="icon" className="bg-transparent border-yellow-400 text-yellow-400">
+                <Button variant="outline" size="icon" className="relative bg-transparent border-yellow-400 text-yellow-400">
                   <ShoppingCart className="h-5 w-5" />
                   {itemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
                       {itemCount}
                     </span>
                   )}
