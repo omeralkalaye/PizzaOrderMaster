@@ -35,17 +35,6 @@ export function Nav() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            {/* כפתור חזרה */}
-            {location !== "/" && (
-              <Button
-                variant="outline"
-                size="icon"
-                className="mr-4 bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                onClick={handleBack}
-              >
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            )}
             {/* לוגו */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
@@ -54,10 +43,21 @@ export function Nav() {
                 </a>
               </Link>
             </div>
+            {/* כפתור חזרה */}
+            {location !== "/" && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="ml-4 bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                onClick={handleBack}
+              >
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            )}
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden sm:flex sm:items-center sm:space-x-4">
+          <div className="hidden sm:flex sm:items-center sm:gap-4">
             {links.map(link => (
               <Link key={link.href} href={link.href}>
                 <a className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
@@ -72,7 +72,7 @@ export function Nav() {
             {!isAdmin && (
               <Link href="/cart">
                 <Button variant="outline" className="relative bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black">
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingCart className="h-5 w-5 ml-2" />
                   {itemCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
                       {itemCount}
@@ -84,7 +84,7 @@ export function Nav() {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="sm:hidden flex items-center space-x-2">
+          <div className="sm:hidden flex items-center gap-2">
             {/* כפתור סל קניות למובייל */}
             {!isAdmin && (
               <Link href="/cart">
@@ -106,12 +106,12 @@ export function Nav() {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-black text-white">
-                <div className="flex flex-col space-y-4 mt-4">
+              <SheetContent side="right" className="bg-black text-white">
+                <div className="flex flex-col gap-4 mt-4">
                   {links.map(link => (
                     <Link key={link.href} href={link.href}>
                       <a onClick={() => setOpen(false)}
-                        className={`px-3 py-2 rounded-md text-sm font-medium
+                        className={`px-3 py-2 rounded-md text-sm font-medium text-right
                         ${location === link.href 
                           ? "bg-primary text-white" 
                           : "text-white hover:bg-yellow-400 hover:text-black"}`}>
