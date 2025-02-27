@@ -34,7 +34,7 @@ export class MemStorage implements IStorage {
     // Add default toppings
     const defaultToppings: InsertTopping[] = [
       {
-        name: "גבינת מוצרלה נוספת",
+        name: "גבינה כפולה",
         price: 600,
         imageUrl: "https://example.com/mozzarella.jpg",
         available: true,

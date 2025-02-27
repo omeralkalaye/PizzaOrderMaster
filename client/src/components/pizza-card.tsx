@@ -37,11 +37,11 @@ interface PizzaCardProps {
   isAdmin?: boolean;
   onEdit?: (pizza: Pizza) => void;
   defaultSize?: PizzaSize;
-  existingItem?: CartItem; // הוספת prop חדש
-  onUpdate?: (updatedItem: CartItem) => void; // הוספת prop חדש
+  existingItem?: CartItem; 
+  onUpdate?: (updatedItem: CartItem) => void; 
 }
 
-const CREAM_SAUCE_PRICE = 500; // 5₪ for cream sauce
+const CREAM_SAUCE_PRICE = 500; 
 
 export function PizzaCard({ 
   pizza, 
@@ -81,7 +81,6 @@ export function PizzaCard({
     const validQuantity = Math.max(1, newQuantity);
     setQuantity(validQuantity);
 
-    // עדכון מערך הפיצות בהתאם לכמות החדשה
     setSelectedPizzas(prev => {
       if (validQuantity > prev.length) {
         return [...prev, ...Array(validQuantity - prev.length).fill({
@@ -167,7 +166,6 @@ export function PizzaCard({
 
   const handleAddToCart = () => {
     if (existingItem && onUpdate) {
-      // אם זה עדכון של פריט קיים
       onUpdate({
         ...existingItem,
         quantity: quantity,
@@ -180,7 +178,6 @@ export function PizzaCard({
         isVeganCheese: selectedPizzas[0].isVeganCheese,
       });
     } else {
-      // אם זה פריט חדש
       selectedPizzas.forEach((pizzaConfig) => {
         dispatch({
           type: "ADD_ITEM",
@@ -248,11 +245,10 @@ export function PizzaCard({
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
               <DialogHeader>
-                <DialogTitle className="text-right">התאם את {pizza.name} לטעמך</DialogTitle>
+                <DialogTitle className="text-center">התאם את {pizza.name} לטעמך</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4">
-                {/* בחירת כמות מגשים */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Button
@@ -274,9 +270,8 @@ export function PizzaCard({
                   <Label>כמות מגשים</Label>
                 </div>
 
-                {/* בחירת מגש */}
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
-                  <TabsList className="w-full justify-start">
+                  <TabsList className="w-full flex-row-reverse">
                     {selectedPizzas.map((_, index) => (
                       <TabsTrigger key={index} value={index.toString()}>
                         מגש {index + 1}
@@ -286,7 +281,6 @@ export function PizzaCard({
 
                   {selectedPizzas.map((pizzaConfig, pizzaIndex) => (
                     <TabsContent key={pizzaIndex} value={pizzaIndex.toString()}>
-                      {/* בחירת רוטב וגבינה */}
                       <div className="space-y-4 mb-4">
                         <div className="flex items-center justify-between">
                           <Switch
@@ -306,7 +300,6 @@ export function PizzaCard({
                         </div>
                       </div>
 
-                      {/* בחירת פריסת תוספות */}
                       <div className="mb-4">
                         <label className="text-sm font-medium mb-2 block text-right">בחר פריסת תוספות</label>
                         <Select
@@ -324,9 +317,8 @@ export function PizzaCard({
                         </Select>
                       </div>
 
-                      {/* בחירת תוספות */}
                       <Tabs defaultValue="0" className="w-full">
-                        <TabsList className="w-full justify-start">
+                        <TabsList className="w-full flex-row-reverse">
                           {Array.from({ length: sections }, (_, i) => (
                             <TabsTrigger key={i} value={i.toString()}>
                               {pizzaConfig.layout === "full" ? "תוספות" :
