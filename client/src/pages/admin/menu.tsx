@@ -72,7 +72,7 @@ export default function AdminMenu() {
       queryClient.invalidateQueries({ queryKey: ["/api/pizzas"] });
       setIsDialogOpen(false);
       form.reset();
-      toast({ title: "Pizza added successfully" });
+      toast({ title: "הפיצה נוספה בהצלחה" });
     },
   });
 
@@ -84,7 +84,7 @@ export default function AdminMenu() {
       setIsDialogOpen(false);
       setEditingPizza(null);
       form.reset();
-      toast({ title: "Pizza updated successfully" });
+      toast({ title: "הפיצה עודכנה בהצלחה" });
     },
   });
 
@@ -118,7 +118,7 @@ export default function AdminMenu() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Manage Menu</h1>
+          <h1 className="text-3xl font-bold">ניהול תפריט</h1>
           <Skeleton className="h-10 w-32" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -133,20 +133,20 @@ export default function AdminMenu() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Manage Menu</h1>
+        <h1 className="text-3xl font-bold">ניהול תפריט</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => {
               setEditingPizza(null);
               form.reset();
             }}>
-              Add New Pizza
+              הוסף פיצה חדשה
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>
-                {editingPizza ? "Edit Pizza" : "Add New Pizza"}
+                {editingPizza ? "עריכת פיצה" : "הוספת פיצה חדשה"}
               </DialogTitle>
             </DialogHeader>
             <Form {...form}>
@@ -156,7 +156,7 @@ export default function AdminMenu() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>שם</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -169,7 +169,7 @@ export default function AdminMenu() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>תיאור</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -182,7 +182,7 @@ export default function AdminMenu() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price ($)</FormLabel>
+                      <FormLabel>מחיר (₪)</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -202,7 +202,7 @@ export default function AdminMenu() {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image</FormLabel>
+                      <FormLabel>תמונה</FormLabel>
                       <FormControl>
                         <Select
                           value={field.value}
@@ -214,7 +214,7 @@ export default function AdminMenu() {
                           <SelectContent>
                             {DEFAULT_IMAGES.map((url) => (
                               <SelectItem key={url} value={url}>
-                                Pizza Image {DEFAULT_IMAGES.indexOf(url) + 1}
+                                תמונת פיצה {DEFAULT_IMAGES.indexOf(url) + 1}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -229,7 +229,7 @@ export default function AdminMenu() {
                   name="available"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between">
-                      <FormLabel>Available</FormLabel>
+                      <FormLabel>זמין</FormLabel>
                       <FormControl>
                         <Switch
                           checked={field.value}
@@ -240,7 +240,7 @@ export default function AdminMenu() {
                   )}
                 />
                 <Button type="submit" className="w-full">
-                  {editingPizza ? "Update Pizza" : "Add Pizza"}
+                  {editingPizza ? "עדכן פיצה" : "הוסף פיצה"}
                 </Button>
               </form>
             </Form>

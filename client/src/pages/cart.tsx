@@ -12,9 +12,9 @@ import { useLocation } from "wouter";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 const orderSchema = z.object({
-  customerName: z.string().min(2, "Name is required"),
-  phone: z.string().min(10, "Valid phone number required"),
-  address: z.string().min(5, "Delivery address is required"),
+  customerName: z.string().min(2, "נא להזין שם מלא"),
+  phone: z.string().min(10, "נא להזין מספר טלפון תקין"),
+  address: z.string().min(5, "נא להזין כתובת מלאה למשלוח"),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -44,21 +44,21 @@ export default function Cart() {
         status: "pending",
         total: calculateTotal(items),
       };
-      
+
       return apiRequest("POST", "/api/orders", orderData);
     },
     onSuccess: () => {
       toast({
-        title: "Order placed successfully!",
-        description: "We'll start preparing your pizza right away.",
+        title: "ההזמנה התקבלה בהצלחה!",
+        description: "נתחיל להכין את הפיצה שלך.",
       });
       dispatch({ type: "CLEAR" });
       setLocation("/");
     },
     onError: () => {
       toast({
-        title: "Failed to place order",
-        description: "Please try again later.",
+        title: "שגיאה בביצוע ההזמנה",
+        description: "נא לנסות שוב מאוחר יותר.",
         variant: "destructive",
       });
     },
@@ -67,8 +67,8 @@ export default function Cart() {
   const onSubmit = (data: OrderFormData) => {
     if (items.length === 0) {
       toast({
-        title: "Cart is empty",
-        description: "Please add some items to your cart first.",
+        title: "הסל ריק",
+        description: "נא להוסיף פריטים לסל לפני ביצוע ההזמנה.",
         variant: "destructive",
       });
       return;
@@ -78,12 +78,12 @@ export default function Cart() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+      <h1 className="text-3xl font-bold mb-8">סל הקניות שלך</h1>
 
       {items.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-muted-foreground mb-4">Your cart is empty</p>
-          <Button onClick={() => setLocation("/menu")}>Browse Menu</Button>
+          <p className="text-muted-foreground mb-4">סל הקניות שלך ריק</p>
+          <Button onClick={() => setLocation("/menu")}>עבור לתפריט</Button>
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
@@ -94,7 +94,7 @@ export default function Cart() {
                   <div>
                     <h3 className="font-medium">{item.pizza.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      ${((item.pizza.price * item.quantity) / 100).toFixed(2)}
+                      ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -132,8 +132,8 @@ export default function Cart() {
             </div>
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
-                <span>Total:</span>
-                <span>${(calculateTotal(items) / 100).toFixed(2)}</span>
+                <span>סה"כ לתשלום:</span>
+                <span>₪{(calculateTotal(items) / 100).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function Cart() {
                   name="customerName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>שם מלא</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -159,7 +159,7 @@ export default function Cart() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel>טלפון</FormLabel>
                       <FormControl>
                         <Input {...field} type="tel" />
                       </FormControl>
@@ -172,7 +172,7 @@ export default function Cart() {
                   name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Delivery Address</FormLabel>
+                      <FormLabel>כתובת למשלוח</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -181,7 +181,7 @@ export default function Cart() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={orderMutation.isPending}>
-                  {orderMutation.isPending ? "Placing Order..." : "Place Order"}
+                  {orderMutation.isPending ? "מבצע הזמנה..." : "בצע הזמנה"}
                 </Button>
               </form>
             </Form>

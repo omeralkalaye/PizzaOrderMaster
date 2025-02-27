@@ -21,6 +21,13 @@ const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   delivered: "bg-gray-100 text-gray-800",
 };
 
+const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: "ממתין",
+  preparing: "בהכנה",
+  ready: "מוכן",
+  delivered: "נמסר",
+};
+
 export default function Orders() {
   const { toast } = useToast();
 
@@ -35,12 +42,12 @@ export default function Orders() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       toast({
-        title: "Order status updated",
+        title: "סטטוס ההזמנה עודכן",
       });
     },
     onError: () => {
       toast({
-        title: "Failed to update order status",
+        title: "שגיאה בעדכון סטטוס ההזמנה",
         variant: "destructive",
       });
     },
@@ -49,7 +56,7 @@ export default function Orders() {
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Orders</h1>
+        <h1 className="text-3xl font-bold mb-8">הזמנות</h1>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <Skeleton key={i} className="h-48 w-full" />
@@ -61,13 +68,13 @@ export default function Orders() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Orders</h1>
+      <h1 className="text-3xl font-bold mb-8">הזמנות</h1>
       <div className="space-y-4">
         {orders?.map((order) => (
           <Card key={order.id}>
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
-                <span>Order #{order.id}</span>
+                <span>הזמנה מס׳ {order.id}</span>
                 <Select
                   value={order.status}
                   onValueChange={(value: OrderStatus) =>
@@ -78,10 +85,10 @@ export default function Orders() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="preparing">Preparing</SelectItem>
-                    <SelectItem value="ready">Ready</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="pending">ממתין</SelectItem>
+                    <SelectItem value="preparing">בהכנה</SelectItem>
+                    <SelectItem value="ready">מוכן</SelectItem>
+                    <SelectItem value="delivered">נמסר</SelectItem>
                   </SelectContent>
                 </Select>
               </CardTitle>
@@ -89,19 +96,19 @@ export default function Orders() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <h3 className="font-medium mb-2">Customer Details</h3>
+                  <h3 className="font-medium mb-2">פרטי לקוח</h3>
                   <p>{order.customerName}</p>
                   <p>{order.phone}</p>
                   <p>{order.address}</p>
                 </div>
                 <div>
-                  <h3 className="font-medium mb-2">Order Details</h3>
-                  <p>Total: ${(order.total / 100).toFixed(2)}</p>
-                  <p>Date: {format(new Date(order.createdAt), "PPp")}</p>
+                  <h3 className="font-medium mb-2">פרטי הזמנה</h3>
+                  <p>סה"כ: ₪{(order.total / 100).toFixed(2)}</p>
+                  <p>תאריך: {format(new Date(order.createdAt), "dd/MM/yyyy HH:mm")}</p>
                   <div className="mt-2">
                     {(order.items as any[]).map((item, index) => (
                       <p key={index}>
-                        {item.quantity}x Pizza #{item.pizzaId}
+                        {item.quantity}x פיצה מס׳ {item.pizzaId}
                       </p>
                     ))}
                   </div>

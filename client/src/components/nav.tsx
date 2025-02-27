@@ -17,13 +17,13 @@ export function Nav() {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const isAdmin = location.startsWith("/admin");
-  
+
   const links = isAdmin ? [
-    { href: "/admin/orders", label: "Orders" },
-    { href: "/admin/menu", label: "Menu" }
+    { href: "/admin/orders", label: "הזמנות" },
+    { href: "/admin/menu", label: "תפריט" }
   ] : [
-    { href: "/", label: "Home" },
-    { href: "/menu", label: "Menu" },
+    { href: "/", label: "דף הבית" },
+    { href: "/menu", label: "תפריט" },
   ];
 
   return (
@@ -33,7 +33,7 @@ export function Nav() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
-                <a className="text-2xl font-bold">🍕 Pizza Shop</a>
+                <a className="text-2xl font-bold">🍕 פיצה שלי</a>
               </Link>
             </div>
           </div>
@@ -50,7 +50,7 @@ export function Nav() {
                 </a>
               </Link>
             ))}
-            
+
             {!isAdmin && (
               <Link href="/cart">
                 <Button variant="outline" className="relative">
@@ -86,12 +86,12 @@ export function Nav() {
                       </a>
                     </Link>
                   ))}
-                  
+
                   {!isAdmin && (
                     <Link href="/cart">
                       <Button variant="outline" className="w-full justify-start" onClick={() => setOpen(false)}>
                         <ShoppingCart className="h-5 w-5 mr-2" />
-                        Cart ({itemCount})
+                        סל קניות ({itemCount})
                       </Button>
                     </Link>
                   )}

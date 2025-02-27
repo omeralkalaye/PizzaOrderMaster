@@ -47,7 +47,7 @@ export function PizzaCard({ pizza, isAdmin, onEdit }: PizzaCardProps) {
         <CardTitle className="flex justify-between items-center">
           <span>{pizza.name}</span>
           <span className="text-lg">
-            ${(pizza.price / 100).toFixed(2)}
+            ₪{(pizza.price / 100).toFixed(2)}
           </span>
         </CardTitle>
       </CardHeader>
@@ -67,16 +67,16 @@ export function PizzaCard({ pizza, isAdmin, onEdit }: PizzaCardProps) {
             className="w-full"
             onClick={() => onEdit?.(pizza)}
           >
-            Edit Pizza
+            ערוך פיצה
           </Button>
         ) : (
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="w-full">Add to Cart</Button>
+              <Button className="w-full">הוסף לסל</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add {pizza.name} to Cart</DialogTitle>
+                <DialogTitle>הוסף {pizza.name} לסל</DialogTitle>
               </DialogHeader>
               <div className="flex items-center justify-center space-x-4 py-4">
                 <Button
@@ -102,7 +102,7 @@ export function PizzaCard({ pizza, isAdmin, onEdit }: PizzaCardProps) {
                 </Button>
               </div>
               <Button onClick={handleAddToCart}>
-                Add to Cart - ${((pizza.price * quantity) / 100).toFixed(2)}
+                הוסף לסל - ₪{((pizza.price * quantity) / 100).toFixed(2)}
               </Button>
             </DialogContent>
           </Dialog>
