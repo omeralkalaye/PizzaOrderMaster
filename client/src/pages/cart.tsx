@@ -12,14 +12,27 @@ import { useLocation } from "wouter";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { PizzaCard, CartItem } from "@/components/pizza-card";
-
+import { PizzaCard } from "@/components/pizza-card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
   phone: z.string().min(10, "נא להזין מספר טלפון תקין"),
-  address: z.string().min(5, "נא להזין כתובת מלאה למשלוח"),
-});
+  deliveryType: z.enum(["delivery", "pickup"]),
+  address: z.string().optional(),
+}).refine(
+  (data) => {
+    // אם נבחר משלוח, חייבים להזין כתובת
+    if (data.deliveryType === "delivery") {
+      return data.address && data.address.length >= 5;
+    }
+    return true;
+  },
+  {
+    message: "נא להזין כתובת מלאה למשלוח",
+    path: ["address"],
+  }
+);
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
@@ -34,9 +47,12 @@ export default function Cart() {
     defaultValues: {
       customerName: "",
       phone: "",
+      deliveryType: "delivery",
       address: "",
     },
   });
+
+  const deliveryType = form.watch("deliveryType");
 
   const orderMutation = useMutation({
     mutationFn: async (data: OrderFormData) => {
@@ -232,17 +248,45 @@ export default function Cart() {
                 />
                 <FormField
                   control={form.control}
-                  name="address"
+                  name="deliveryType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>כתובת למשלוח</FormLabel>
+                      <FormLabel>אופן קבלת ההזמנה</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="flex gap-4"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="delivery" id="delivery" />
+                            <label htmlFor="delivery">משלוח</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="pickup" id="pickup" />
+                            <label htmlFor="pickup">איסוף עצמי</label>
+                          </div>
+                        </RadioGroup>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                {deliveryType === "delivery" && (
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>כתובת למשלוח</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <Button type="submit" className="w-full" disabled={orderMutation.isPending}>
                   {orderMutation.isPending ? "מבצע הזמנה..." : "בצע הזמנה"}
                 </Button>

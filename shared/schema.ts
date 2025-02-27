@@ -64,7 +64,18 @@ export const orders = pgTable("orders", {
 
 export const insertPizzaSchema = createInsertSchema(pizzas).omit({ id: true });
 export const insertToppingSchema = createInsertSchema(toppings).omit({ id: true });
-export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true });
+export const insertOrderSchema = createInsertSchema(orders)
+  .omit({ id: true, createdAt: true })
+  .extend({
+    deliveryType: z.enum(["delivery", "pickup"]),
+    address: z.string().optional().refine(
+      (address) => {
+        if (address === undefined) return true;
+        return address.length >= 5;
+      },
+      { message: "נא להזין כתובת מלאה למשלוח" }
+    ),
+  });
 
 export type Pizza = typeof pizzas.$inferSelect;
 export type InsertPizza = z.infer<typeof insertPizzaSchema>;
