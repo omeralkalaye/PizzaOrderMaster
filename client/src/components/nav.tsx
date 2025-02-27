@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { ShoppingCart, Menu } from "lucide-react";
+import { ShoppingCart, Menu, ArrowRight } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 
 export function Nav() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { state: { items } } = useCart();
   const [open, setOpen] = useState(false);
 
@@ -26,11 +26,27 @@ export function Nav() {
     { href: "/menu", label: "תפריט" },
   ];
 
+  const handleBack = () => {
+    window.history.back();
+  };
+
   return (
     <nav className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
+          <div className="flex items-center">
+            {/* כפתור חזרה */}
+            {location !== "/" && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="mr-4 bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                onClick={handleBack}
+              >
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            )}
+            {/* לוגו */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
                 <a>
@@ -68,7 +84,22 @@ export function Nav() {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="sm:hidden flex items-center">
+          <div className="sm:hidden flex items-center space-x-2">
+            {/* כפתור סל קניות למובייל */}
+            {!isAdmin && (
+              <Link href="/cart">
+                <Button variant="outline" size="icon" className="bg-transparent border-yellow-400 text-yellow-400">
+                  <ShoppingCart className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                      {itemCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            )}
+
+            {/* תפריט המבורגר */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="bg-transparent border-yellow-400 text-yellow-400">
@@ -88,15 +119,6 @@ export function Nav() {
                       </a>
                     </Link>
                   ))}
-
-                  {!isAdmin && (
-                    <Link href="/cart">
-                      <Button variant="outline" className="w-full justify-start bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black" onClick={() => setOpen(false)}>
-                        <ShoppingCart className="h-5 w-5 mr-2" />
-                        סל קניות ({itemCount})
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </SheetContent>
             </Sheet>
