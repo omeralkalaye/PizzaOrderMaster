@@ -27,6 +27,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Topping } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface PizzaCardProps {
   pizza: Pizza;
@@ -35,12 +37,15 @@ interface PizzaCardProps {
   defaultSize?: PizzaSize;
 }
 
+const CREAM_SAUCE_PRICE = 500; // 5₪ for cream sauce
+
 export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCardProps) {
   const { dispatch } = useCart();
-  const [size, setSize] = useState<PizzaSize>(defaultSize);
+  const [size] = useState<PizzaSize>(defaultSize);
   const [layout, setLayout] = useState<ToppingLayout>("full");
   const [selectedToppings, setSelectedToppings] = useState<number[][]>([[]]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreamSauce, setIsCreamSauce] = useState(false);
 
   const { data: toppings } = useQuery<Topping[]>({
     queryKey: ["/api/toppings"],
@@ -64,12 +69,13 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
   };
 
   const calculatePrice = () => {
-    const basePrice = pizza.price * pizzaSizes[size].priceMultiplier;
+    const basePrice = pizza.price;
+    const saucePrice = isCreamSauce ? CREAM_SAUCE_PRICE : 0;
     const toppingsPrice = selectedToppings.flat().reduce((total, toppingId) => {
       const topping = toppings?.find(t => t.id === toppingId);
       return total + (topping?.price || 0);
     }, 0);
-    return basePrice + toppingsPrice;
+    return basePrice + saucePrice + toppingsPrice;
   };
 
   const handleAddToCart = () => {
@@ -84,12 +90,13 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
           layout,
           sections: selectedToppings
         },
+        isCreamSauce,
       },
     });
     setIsDialogOpen(false);
-    setSize("M");
     setLayout("full");
     setSelectedToppings([[]]);
+    setIsCreamSauce(false);
   };
 
   return (
@@ -131,21 +138,14 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
               </DialogHeader>
 
               <div className="space-y-4">
-                {/* בחירת גודל */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">בחר גודל</label>
-                  <Select value={size} onValueChange={(value: PizzaSize) => setSize(value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(pizzaSizes).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
-                          {key} (x{value.priceMultiplier})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* בחירת רוטב */}
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="cream-sauce">רוטב שמנת (+ ₪5)</Label>
+                  <Switch
+                    id="cream-sauce"
+                    checked={isCreamSauce}
+                    onCheckedChange={setIsCreamSauce}
+                  />
                 </div>
 
                 {/* בחירת פריסת תוספות */}

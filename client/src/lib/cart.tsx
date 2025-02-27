@@ -3,6 +3,7 @@ import { Pizza, PizzaOrderItem, PizzaSize, ToppingLayout } from "@shared/schema"
 
 interface CartItem extends PizzaOrderItem {
   pizza: Pizza;
+  isCreamSauce?: boolean;
 }
 
 interface CartState {
@@ -23,11 +24,12 @@ const CartContext = createContext<{
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
-      // Check if the same pizza with the same size and toppings layout exists
+      // Check if the same pizza with the same size, sauce and toppings layout exists
       const existingIndex = state.items.findIndex(
         item =>
           item.pizzaId === action.payload.pizzaId &&
           item.size === action.payload.size &&
+          item.isCreamSauce === action.payload.isCreamSauce &&
           JSON.stringify(item.toppingLayout) === JSON.stringify(action.payload.toppingLayout)
       );
 
@@ -83,8 +85,13 @@ export function useCart() {
 
 export function calculateTotal(items: CartItem[]): number {
   return items.reduce((total, item) => {
-    // Calculate base price with size multiplier
+    // Calculate base price
     let itemTotal = item.pizza.price;
+
+    // Add cream sauce price if selected
+    if (item.isCreamSauce) {
+      itemTotal += 500; // 5₪ for cream sauce
+    }
 
     // Add toppings price
     item.toppingLayout.sections.forEach(section => {
