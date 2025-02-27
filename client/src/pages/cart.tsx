@@ -55,41 +55,6 @@ export default function Cart() {
 
   const deliveryType = form.watch("deliveryType");
 
-  const orderMutation = useMutation({
-    mutationFn: async (data: OrderFormData) => {
-      const orderData = {
-        ...data,
-        items: items.map(item => ({
-          pizzaId: item.pizzaId,
-          quantity: item.quantity,
-          size: item.size,
-          toppingLayout: item.toppingLayout,
-          isCreamSauce: item.isCreamSauce,
-          isVeganCheese: item.isVeganCheese,
-        })),
-        status: "pending",
-        total: calculateTotal(items),
-      };
-
-      return apiRequest("POST", "/api/orders", orderData);
-    },
-    onSuccess: () => {
-      toast({
-        title: "ההזמנה התקבלה בהצלחה!",
-        description: "נתחיל להכין את הפיצה שלך.",
-      });
-      dispatch({ type: "CLEAR" });
-      setLocation("/");
-    },
-    onError: () => {
-      toast({
-        title: "שגיאה בביצוע ההזמנה",
-        description: "נא לנסות שוב מאוחר יותר.",
-        variant: "destructive",
-      });
-    },
-  });
-
   const onSubmit = (data: OrderFormData) => {
     if (items.length === 0) {
       toast({
@@ -99,7 +64,23 @@ export default function Cart() {
       });
       return;
     }
-    orderMutation.mutate(data);
+
+    const orderData = {
+      ...data,
+      items: items.map(item => ({
+        pizzaId: item.pizzaId,
+        quantity: item.quantity,
+        size: item.size,
+        toppingLayout: item.toppingLayout,
+        isCreamSauce: item.isCreamSauce,
+        isVeganCheese: item.isVeganCheese,
+      })),
+      status: "pending",
+      total: calculateTotal(items),
+    };
+
+    // שמירת פרטי ההזמנה ב-history state ומעבר לעמוד התשלום
+    setLocation("/payment");
   };
 
   const handleUpdateItem = (updatedItem: CartItem) => {
@@ -212,8 +193,8 @@ export default function Cart() {
 
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
-                <span>סה"כ לתשלום:</span>
                 <span>₪{(calculateTotal(items) / 100).toFixed(2)}</span>
+                <span>:סה"כ לתשלום</span>
               </div>
             </div>
           </div>
@@ -288,8 +269,8 @@ export default function Cart() {
                     )}
                   />
                 )}
-                <Button type="submit" className="w-full" disabled={orderMutation.isPending}>
-                  {orderMutation.isPending ? "מבצע הזמנה..." : "בצע הזמנה"}
+                <Button type="submit" className="w-full">
+                  מעבר לתשלום
                 </Button>
               </form>
             </Form>

@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Menu from "@/pages/menu";
 import Cart from "@/pages/cart";
+import Payment from "@/pages/payment";
 import AdminOrders from "@/pages/admin/orders";
 import AdminMenu from "@/pages/admin/menu";
 
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/menu" component={Menu} />
       <Route path="/cart" component={Cart} />
+      <Route path="/payment" component={Payment} />
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/menu" component={AdminMenu} />
       <Route component={NotFound} />
