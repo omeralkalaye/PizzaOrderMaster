@@ -26,7 +26,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Topping } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Minus, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -42,65 +42,144 @@ const CREAM_SAUCE_PRICE = 500; // 5₪ for cream sauce
 export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCardProps) {
   const { dispatch } = useCart();
   const [size] = useState<PizzaSize>(defaultSize);
-  const [layout, setLayout] = useState<ToppingLayout>("full");
-  const [selectedToppings, setSelectedToppings] = useState<number[][]>([[]]);
+  const [quantity, setQuantity] = useState(1); // כמות מגשים
+  const [selectedPizzas, setSelectedPizzas] = useState<Array<{
+    layout: ToppingLayout;
+    sections: number[][];
+    isCreamSauce: boolean;
+    isVeganCheese: boolean;
+  }>>([{
+    layout: "full",
+    sections: [[]],
+    isCreamSauce: false,
+    isVeganCheese: false,
+  }]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCreamSauce, setIsCreamSauce] = useState(false);
-  const [isVeganCheese, setIsVeganCheese] = useState(false);
+  const [currentPizzaIndex, setCurrentPizzaIndex] = useState(0);
 
   const { data: toppings } = useQuery<Topping[]>({
     queryKey: ["/api/toppings"],
   });
 
-  const sections = layout === "full" ? 1 : layout === "half" ? 2 : 4;
+  const updatePizzaQuantity = (newQuantity: number) => {
+    const validQuantity = Math.max(1, newQuantity);
+    setQuantity(validQuantity);
 
-  const handleToppingToggle = (sectionIndex: number, toppingId: number) => {
-    setSelectedToppings(current => {
-      const newToppings = [...current];
-      const section = newToppings[sectionIndex] || [];
-
-      if (section.includes(toppingId)) {
-        newToppings[sectionIndex] = section.filter(id => id !== toppingId);
-      } else if (section.length < 3) {
-        newToppings[sectionIndex] = [...section, toppingId];
+    // עדכון מערך הפיצות בהתאם לכמות החדשה
+    setSelectedPizzas(prev => {
+      if (validQuantity > prev.length) {
+        return [...prev, ...Array(validQuantity - prev.length).fill({
+          layout: "full",
+          sections: [[]],
+          isCreamSauce: false,
+          isVeganCheese: false,
+        })];
       }
-
-      return newToppings;
+      return prev.slice(0, validQuantity);
     });
   };
 
-  const calculatePrice = () => {
+  const handleToppingToggle = (sectionIndex: number, toppingId: number) => {
+    setSelectedPizzas(pizzas => {
+      const newPizzas = [...pizzas];
+      const currentPizza = { ...newPizzas[currentPizzaIndex] };
+      const sections = [...currentPizza.sections];
+      const section = sections[sectionIndex] || [];
+
+      if (section.includes(toppingId)) {
+        sections[sectionIndex] = section.filter(id => id !== toppingId);
+      } else if (section.length < 3) {
+        sections[sectionIndex] = [...section, toppingId];
+      }
+
+      currentPizza.sections = sections;
+      newPizzas[currentPizzaIndex] = currentPizza;
+      return newPizzas;
+    });
+  };
+
+  const updatePizzaLayout = (pizzaIndex: number, layout: ToppingLayout) => {
+    setSelectedPizzas(pizzas => {
+      const newPizzas = [...pizzas];
+      const sections = Array(layout === "full" ? 1 : layout === "half" ? 2 : 4).fill([]);
+      newPizzas[pizzaIndex] = {
+        ...newPizzas[pizzaIndex],
+        layout,
+        sections,
+      };
+      return newPizzas;
+    });
+  };
+
+  const updatePizzaSauce = (pizzaIndex: number, isCreamSauce: boolean) => {
+    setSelectedPizzas(pizzas => {
+      const newPizzas = [...pizzas];
+      newPizzas[pizzaIndex] = {
+        ...newPizzas[pizzaIndex],
+        isCreamSauce,
+      };
+      return newPizzas;
+    });
+  };
+
+  const updatePizzaCheese = (pizzaIndex: number, isVeganCheese: boolean) => {
+    setSelectedPizzas(pizzas => {
+      const newPizzas = [...pizzas];
+      newPizzas[pizzaIndex] = {
+        ...newPizzas[pizzaIndex],
+        isVeganCheese,
+      };
+      return newPizzas;
+    });
+  };
+
+  const calculatePizzaPrice = (pizzaConfig: typeof selectedPizzas[0]) => {
     const basePrice = pizza.price;
-    const saucePrice = isCreamSauce ? CREAM_SAUCE_PRICE : 0;
-    const toppingsPrice = selectedToppings.flat().reduce((total, toppingId) => {
+    const saucePrice = pizzaConfig.isCreamSauce ? CREAM_SAUCE_PRICE : 0;
+    const toppingsPrice = pizzaConfig.sections.flat().reduce((total, toppingId) => {
       const topping = toppings?.find(t => t.id === toppingId);
       return total + (topping?.price || 0);
     }, 0);
     return basePrice + saucePrice + toppingsPrice;
   };
 
+  const calculateTotalPrice = () => {
+    return selectedPizzas.reduce((total, pizzaConfig) => {
+      return total + calculatePizzaPrice(pizzaConfig);
+    }, 0);
+  };
+
   const handleAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        pizzaId: pizza.id,
-        pizza,
-        size,
-        quantity: 1,
-        toppingLayout: {
-          layout,
-          sections: selectedToppings
+    selectedPizzas.forEach((pizzaConfig) => {
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          pizzaId: pizza.id,
+          pizza,
+          size,
+          quantity: 1,
+          toppingLayout: {
+            layout: pizzaConfig.layout,
+            sections: pizzaConfig.sections
+          },
+          isCreamSauce: pizzaConfig.isCreamSauce,
+          isVeganCheese: pizzaConfig.isVeganCheese,
         },
-        isCreamSauce,
-        isVeganCheese,
-      },
+      });
     });
     setIsDialogOpen(false);
-    setLayout("full");
-    setSelectedToppings([[]]);
-    setIsCreamSauce(false);
-    setIsVeganCheese(false);
+    setQuantity(1);
+    setSelectedPizzas([{
+      layout: "full",
+      sections: [[]],
+      isCreamSauce: false,
+      isVeganCheese: false,
+    }]);
+    setCurrentPizzaIndex(0);
   };
+
+  const currentPizza = selectedPizzas[currentPizzaIndex];
+  const sections = currentPizza.layout === "full" ? 1 : currentPizza.layout === "half" ? 2 : 4;
 
   return (
     <Card className="w-full">
@@ -133,92 +212,143 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
         ) : (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full">הוסף לסל</Button>
+              <Button className="w-full">בחר</Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>הוסף {pizza.name} לסל</DialogTitle>
+                <DialogTitle>התאם את {pizza.name} לטעמך</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4">
-                {/* בחירת רוטב וגבינה */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="cream-sauce">רוטב שמנת (+ ₪5)</Label>
-                    <Switch
-                      id="cream-sauce"
-                      checked={isCreamSauce}
-                      onCheckedChange={setIsCreamSauce}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="vegan-cheese">גבינה טבעונית</Label>
-                    <Switch
-                      id="vegan-cheese"
-                      checked={isVeganCheese}
-                      onCheckedChange={setIsVeganCheese}
-                    />
+                {/* בחירת כמות מגשים */}
+                <div className="flex items-center justify-between">
+                  <Label>כמות מגשים</Label>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => updatePizzaQuantity(quantity - 1)}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center">{quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => updatePizzaQuantity(quantity + 1)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
 
-                {/* בחירת פריסת תוספות */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">בחר פריסת תוספות</label>
-                  <Select value={layout} onValueChange={(value: ToppingLayout) => {
-                    setLayout(value as ToppingLayout);
-                    setSelectedToppings(Array(value === "full" ? 1 : value === "half" ? 2 : 4).fill([]));
-                  }}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full">על כל הפיצה</SelectItem>
-                      <SelectItem value="half">חצי-חצי</SelectItem>
-                      <SelectItem value="quarter">רבעים</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* בחירת תוספות */}
-                <Tabs defaultValue="0" className="w-full">
+                {/* בחירת מגש */}
+                <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
                   <TabsList className="w-full justify-start">
-                    {Array.from({ length: sections }, (_, i) => (
-                      <TabsTrigger key={i} value={i.toString()}>
-                        {layout === "full" ? "תוספות" :
-                         layout === "half" ? `חצי ${i + 1}` :
-                         `רבע ${i + 1}`}
+                    {selectedPizzas.map((_, index) => (
+                      <TabsTrigger key={index} value={index.toString()}>
+                        מגש {index + 1}
                       </TabsTrigger>
                     ))}
                   </TabsList>
 
-                  {Array.from({ length: sections }, (_, sectionIndex) => (
-                    <TabsContent key={sectionIndex} value={sectionIndex.toString()}>
-                      <div className="grid grid-cols-2 gap-2">
-                        {toppings?.map(topping => {
-                          const isSelected = selectedToppings[sectionIndex]?.includes(topping.id);
-                          const canSelect = !isSelected && (!selectedToppings[sectionIndex] || selectedToppings[sectionIndex].length < 3);
+                  {selectedPizzas.map((pizzaConfig, pizzaIndex) => (
+                    <TabsContent key={pizzaIndex} value={pizzaIndex.toString()}>
+                      {/* בחירת רוטב וגבינה */}
+                      <div className="space-y-4 mb-4">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
+                          <Switch
+                            id={`cream-sauce-${pizzaIndex}`}
+                            checked={pizzaConfig.isCreamSauce}
+                            onCheckedChange={(checked) => updatePizzaSauce(pizzaIndex, checked)}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
+                          <Switch
+                            id={`vegan-cheese-${pizzaIndex}`}
+                            checked={pizzaConfig.isVeganCheese}
+                            onCheckedChange={(checked) => updatePizzaCheese(pizzaIndex, checked)}
+                          />
+                        </div>
+                      </div>
 
-                          return (
-                            <Button
-                              key={topping.id}
-                              variant={isSelected ? "secondary" : "outline"}
-                              className="justify-start"
-                              onClick={() => handleToppingToggle(sectionIndex, topping.id)}
-                              disabled={!isSelected && !canSelect}
-                            >
-                              {isSelected && <CheckCircle2 className="w-4 h-4 mr-2" />}
-                              {topping.name} (₪{(topping.price / 100).toFixed(2)})
-                            </Button>
-                          );
-                        })}
+                      {/* בחירת פריסת תוספות */}
+                      <div className="mb-4">
+                        <label className="text-sm font-medium mb-2 block">בחר פריסת תוספות</label>
+                        <Select 
+                          value={pizzaConfig.layout} 
+                          onValueChange={(value: ToppingLayout) => updatePizzaLayout(pizzaIndex, value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="full">על כל הפיצה</SelectItem>
+                            <SelectItem value="half">חצי-חצי</SelectItem>
+                            <SelectItem value="quarter">רבעים</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* בחירת תוספות */}
+                      <Tabs defaultValue="0" className="w-full">
+                        <TabsList className="w-full justify-start">
+                          {Array.from({ length: sections }, (_, i) => (
+                            <TabsTrigger key={i} value={i.toString()}>
+                              {pizzaConfig.layout === "full" ? "תוספות" :
+                               pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
+                               `רבע ${i + 1}`}
+                            </TabsTrigger>
+                          ))}
+                        </TabsList>
+
+                        {Array.from({ length: sections }, (_, sectionIndex) => (
+                          <TabsContent key={sectionIndex} value={sectionIndex.toString()}>
+                            <div className="grid grid-cols-2 gap-2">
+                              {toppings?.map(topping => {
+                                const isSelected = pizzaConfig.sections[sectionIndex]?.includes(topping.id);
+                                const canSelect = !isSelected && (!pizzaConfig.sections[sectionIndex] || pizzaConfig.sections[sectionIndex].length < 3);
+
+                                return (
+                                  <Button
+                                    key={topping.id}
+                                    variant={isSelected ? "secondary" : "outline"}
+                                    className="justify-start"
+                                    onClick={() => handleToppingToggle(sectionIndex, topping.id)}
+                                    disabled={!isSelected && !canSelect}
+                                  >
+                                    {isSelected && <CheckCircle2 className="w-4 h-4 mr-2" />}
+                                    {topping.name} (₪{(topping.price / 100).toFixed(2)})
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                          </TabsContent>
+                        ))}
+                      </Tabs>
+
+                      <div className="mt-4 p-4 border rounded-lg">
+                        <div className="flex justify-between text-lg">
+                          <span>מחיר למגש:</span>
+                          <span>₪{(calculatePizzaPrice(pizzaConfig) / 100).toFixed(2)}</span>
+                        </div>
                       </div>
                     </TabsContent>
                   ))}
                 </Tabs>
               </div>
 
+              <div className="mt-4 p-4 border rounded-lg">
+                <div className="flex justify-between text-lg font-bold">
+                  <span>סה"כ לתשלום:</span>
+                  <span>₪{(calculateTotalPrice() / 100).toFixed(2)}</span>
+                </div>
+              </div>
+
               <Button onClick={handleAddToCart} className="w-full mt-4">
-                הוסף לסל - ₪{(calculatePrice() / 100).toFixed(2)}
+                הוסף לסל
               </Button>
             </DialogContent>
           </Dialog>

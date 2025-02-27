@@ -40,6 +40,10 @@ export default function Cart() {
         items: items.map(item => ({
           pizzaId: item.pizzaId,
           quantity: item.quantity,
+          size: item.size,
+          toppingLayout: item.toppingLayout,
+          isCreamSauce: item.isCreamSauce,
+          isVeganCheese: item.isVeganCheese,
         })),
         status: "pending",
         total: calculateTotal(items),
@@ -89,46 +93,65 @@ export default function Cart() {
         <div className="grid gap-8 md:grid-cols-2">
           <div>
             <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.pizzaId} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-medium">{item.pizza.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
-                    </p>
+              {items.map((item) => {
+                const toppingsCount = item.toppingLayout.sections.flat().length;
+                const hasToppings = toppingsCount > 0;
+                const hasSpecialSauce = item.isCreamSauce;
+                const hasVeganCheese = item.isVeganCheese;
+
+                return (
+                  <div key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`} 
+                       className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
+                      {hasSpecialSauce && (
+                        <p className="text-sm text-muted-foreground">רוטב שמנת</p>
+                      )}
+                      {hasVeganCheese && (
+                        <p className="text-sm text-muted-foreground">גבינה טבעונית</p>
+                      )}
+                      {hasToppings && (
+                        <p className="text-sm text-muted-foreground">
+                          {toppingsCount} תוספות
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => dispatch({
+                          type: "UPDATE_QUANTITY",
+                          payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
+                        })}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => dispatch({
+                          type: "UPDATE_QUANTITY",
+                          payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
+                        })}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId })}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => dispatch({
-                        type: "UPDATE_QUANTITY",
-                        payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
-                      })}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => dispatch({
-                        type: "UPDATE_QUANTITY",
-                        payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
-                      })}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId })}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
