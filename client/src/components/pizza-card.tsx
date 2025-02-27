@@ -46,6 +46,7 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
   const [selectedToppings, setSelectedToppings] = useState<number[][]>([[]]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreamSauce, setIsCreamSauce] = useState(false);
+  const [isVeganCheese, setIsVeganCheese] = useState(false);
 
   const { data: toppings } = useQuery<Topping[]>({
     queryKey: ["/api/toppings"],
@@ -91,12 +92,14 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
           sections: selectedToppings
         },
         isCreamSauce,
+        isVeganCheese,
       },
     });
     setIsDialogOpen(false);
     setLayout("full");
     setSelectedToppings([[]]);
     setIsCreamSauce(false);
+    setIsVeganCheese(false);
   };
 
   return (
@@ -138,14 +141,24 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
               </DialogHeader>
 
               <div className="space-y-4">
-                {/* בחירת רוטב */}
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="cream-sauce">רוטב שמנת (+ ₪5)</Label>
-                  <Switch
-                    id="cream-sauce"
-                    checked={isCreamSauce}
-                    onCheckedChange={setIsCreamSauce}
-                  />
+                {/* בחירת רוטב וגבינה */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="cream-sauce">רוטב שמנת (+ ₪5)</Label>
+                    <Switch
+                      id="cream-sauce"
+                      checked={isCreamSauce}
+                      onCheckedChange={setIsCreamSauce}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="vegan-cheese">גבינה טבעונית</Label>
+                    <Switch
+                      id="vegan-cheese"
+                      checked={isVeganCheese}
+                      onCheckedChange={setIsVeganCheese}
+                    />
+                  </div>
                 </div>
 
                 {/* בחירת פריסת תוספות */}
