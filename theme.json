@@ -1,6 +1,13 @@
 {
   "variant": "professional",
-  "primary": "hsl(16 100% 50%)",
+  "primary": "hsl(0 100% 50%)",
   "appearance": "light",
-  "radius": 0.5
+  "radius": 0.5,
+  "cssVars": {
+    "light": {
+      "accent": "hsl(60 100% 50%)",
+      "background": "hsl(0 0% 100%)",
+      "foreground": "hsl(0 0% 0%)"
+    }
+  }
 }
