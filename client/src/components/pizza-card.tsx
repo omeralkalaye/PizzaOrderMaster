@@ -309,10 +309,10 @@ export function PizzaCard({
                           <SelectTrigger className="text-right">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="full">על כל הפיצה</SelectItem>
-                            <SelectItem value="half">חצי-חצי</SelectItem>
-                            <SelectItem value="quarter">רבעים</SelectItem>
+                          <SelectContent align="end">
+                            <SelectItem value="full" className="text-right">על כל הפיצה</SelectItem>
+                            <SelectItem value="half" className="text-right">חצי-חצי</SelectItem>
+                            <SelectItem value="quarter" className="text-right">רבעים</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -322,8 +322,8 @@ export function PizzaCard({
                           {Array.from({ length: sections }, (_, i) => (
                             <TabsTrigger key={i} value={i.toString()}>
                               {pizzaConfig.layout === "full" ? "תוספות" :
-                               pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
-                               `רבע ${i + 1}`}
+                                pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
+                                `רבע ${i + 1}`}
                             </TabsTrigger>
                           ))}
                         </TabsList>
