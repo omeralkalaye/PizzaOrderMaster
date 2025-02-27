@@ -214,7 +214,7 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
             <DialogTrigger asChild>
               <Button className="w-full">בחר</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
               <DialogHeader>
                 <DialogTitle>התאם את {pizza.name} לטעמך</DialogTitle>
               </DialogHeader>
@@ -277,8 +277,8 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
                       {/* בחירת פריסת תוספות */}
                       <div className="mb-4">
                         <label className="text-sm font-medium mb-2 block">בחר פריסת תוספות</label>
-                        <Select 
-                          value={pizzaConfig.layout} 
+                        <Select
+                          value={pizzaConfig.layout}
                           onValueChange={(value: ToppingLayout) => updatePizzaLayout(pizzaIndex, value)}
                         >
                           <SelectTrigger>
@@ -298,8 +298,8 @@ export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCa
                           {Array.from({ length: sections }, (_, i) => (
                             <TabsTrigger key={i} value={i.toString()}>
                               {pizzaConfig.layout === "full" ? "תוספות" :
-                               pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
-                               `רבע ${i + 1}`}
+                                pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
+                                `רבע ${i + 1}`}
                             </TabsTrigger>
                           ))}
                         </TabsList>
