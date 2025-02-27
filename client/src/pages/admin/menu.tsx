@@ -36,14 +36,14 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const DEFAULT_IMAGES = [
+  "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
+  "https://images.unsplash.com/photo-1585238342024-78d387f4a707",
+  "https://images.unsplash.com/photo-1571066811602-716837d681de",
+  "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e",
   "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-  "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee",
-  "https://images.unsplash.com/photo-1528137871618-79d2761e3fd5",
-  "https://images.unsplash.com/photo-1489564239502-7a532064e1c2",
-  "https://images.unsplash.com/photo-1579751626657-72bc17010498",
-  "https://images.unsplash.com/photo-1528830984461-4d5c3cc1abf0",
-  "https://images.unsplash.com/photo-1576458088443-04a19bb13da6",
-  "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907",
+  "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
+  "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+  "https://images.unsplash.com/photo-1552539618-7eec9b4d1796",
 ];
 
 export default function AdminMenu() {

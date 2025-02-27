@@ -6,7 +6,7 @@ export interface IStorage {
   getPizza(id: number): Promise<Pizza | undefined>;
   createPizza(pizza: InsertPizza): Promise<Pizza>;
   updatePizza(id: number, pizza: Partial<InsertPizza>): Promise<Pizza | undefined>;
-  
+
   // Order operations
   getOrders(): Promise<Order[]>;
   getOrder(id: number): Promise<Order | undefined>;
@@ -23,24 +23,30 @@ export class MemStorage implements IStorage {
   constructor() {
     this.pizzas = new Map();
     this.orders = new Map();
-    
+
     // Add some default pizzas
     const defaultPizzas: InsertPizza[] = [
       {
-        name: "Margherita",
-        description: "Classic tomato sauce with mozzarella",
+        name: "מרגריטה",
+        description: "רוטב עגבניות, גבינת מוצרלה ובזיליקום טרי",
         price: 1200,
-        imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
+        imageUrl: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
         available: true,
       },
       {
-        name: "Pepperoni",
-        description: "Tomato sauce, mozzarella, and pepperoni",
+        name: "ארבע גבינות",
+        description: "מוצרלה, פרמזן, גורגונזולה וריקוטה",
         price: 1400,
-        imageUrl: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee",
+        imageUrl: "https://images.unsplash.com/photo-1585238342024-78d387f4a707",
         available: true,
       },
-      // Add more default pizzas...
+      {
+        name: "פטריות",
+        description: "רוטב עגבניות, מוצרלה ופטריות טריות",
+        price: 1300,
+        imageUrl: "https://images.unsplash.com/photo-1571066811602-716837d681de",
+        available: true,
+      },
     ];
 
     defaultPizzas.forEach(pizza => this.createPizza(pizza));
@@ -64,7 +70,7 @@ export class MemStorage implements IStorage {
   async updatePizza(id: number, pizza: Partial<InsertPizza>): Promise<Pizza | undefined> {
     const existing = this.pizzas.get(id);
     if (!existing) return undefined;
-    
+
     const updated = { ...existing, ...pizza };
     this.pizzas.set(id, updated);
     return updated;
@@ -88,7 +94,7 @@ export class MemStorage implements IStorage {
   async updateOrderStatus(id: number, status: OrderStatus): Promise<Order | undefined> {
     const existing = this.orders.get(id);
     if (!existing) return undefined;
-    
+
     const updated = { ...existing, status };
     this.orders.set(id, updated);
     return updated;

@@ -58,23 +58,23 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <img
-              src="https://images.unsplash.com/photo-1513104890138-7c749659a591"
-              alt="פיצה"
+              src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca"
+              alt="פיצה מרגריטה"
               className="rounded-lg aspect-square object-cover"
             />
             <img
-              src="https://images.unsplash.com/photo-1534308983496-4fabb1a015ee"
-              alt="פיצה"
+              src="https://images.unsplash.com/photo-1585238342024-78d387f4a707"
+              alt="פיצה ארבע גבינות"
               className="rounded-lg aspect-square object-cover"
             />
             <img
-              src="https://images.unsplash.com/photo-1528137871618-79d2761e3fd5"
-              alt="פיצה"
+              src="https://images.unsplash.com/photo-1571066811602-716837d681de"
+              alt="פיצה פטריות"
               className="rounded-lg aspect-square object-cover"
             />
             <img
-              src="https://images.unsplash.com/photo-1489564239502-7a532064e1c2"
-              alt="פיצה"
+              src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e"
+              alt="פיצה ירקות"
               className="rounded-lg aspect-square object-cover"
             />
           </div>
