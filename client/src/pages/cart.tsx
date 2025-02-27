@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PizzaCard } from "@/components/pizza-card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CartItem } from "@/types/cart";
 
 const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
