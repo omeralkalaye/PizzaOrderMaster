@@ -27,7 +27,7 @@ export function Nav() {
   ];
 
   return (
-    <nav className="border-b">
+    <nav className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -44,10 +44,10 @@ export function Nav() {
           <div className="hidden sm:flex sm:items-center sm:space-x-4">
             {links.map(link => (
               <Link key={link.href} href={link.href}>
-                <a className={`px-3 py-2 rounded-md text-sm font-medium
+                <a className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
                   ${location === link.href 
-                    ? "bg-primary text-primary-foreground" 
-                    : "text-foreground hover:bg-accent"}`}>
+                    ? "bg-primary text-white" 
+                    : "text-white hover:bg-yellow-400 hover:text-black"}`}>
                   {link.label}
                 </a>
               </Link>
@@ -55,10 +55,10 @@ export function Nav() {
 
             {!isAdmin && (
               <Link href="/cart">
-                <Button variant="outline" className="relative">
+                <Button variant="outline" className="relative bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black">
                   <ShoppingCart className="h-5 w-5" />
                   {itemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
                       {itemCount}
                     </span>
                   )}
@@ -71,19 +71,19 @@ export function Nav() {
           <div className="sm:hidden flex items-center">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" className="bg-transparent border-yellow-400 text-yellow-400">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="bg-black text-white">
                 <div className="flex flex-col space-y-4 mt-4">
                   {links.map(link => (
                     <Link key={link.href} href={link.href}>
                       <a onClick={() => setOpen(false)}
                         className={`px-3 py-2 rounded-md text-sm font-medium
                         ${location === link.href 
-                          ? "bg-primary text-primary-foreground" 
-                          : "text-foreground hover:bg-accent"}`}>
+                          ? "bg-primary text-white" 
+                          : "text-white hover:bg-yellow-400 hover:text-black"}`}>
                         {link.label}
                       </a>
                     </Link>
@@ -91,7 +91,7 @@ export function Nav() {
 
                   {!isAdmin && (
                     <Link href="/cart">
-                      <Button variant="outline" className="w-full justify-start" onClick={() => setOpen(false)}>
+                      <Button variant="outline" className="w-full justify-start bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black" onClick={() => setOpen(false)}>
                         <ShoppingCart className="h-5 w-5 mr-2" />
                         סל קניות ({itemCount})
                       </Button>

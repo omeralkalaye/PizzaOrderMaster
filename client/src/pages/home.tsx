@@ -6,25 +6,25 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <div 
-        className="relative h-[70vh] flex items-center justify-center bg-cover bg-center"
+        className="relative h-[70vh] flex items-center justify-center bg-cover bg-center bg-black"
         style={{
           backgroundImage: 'url(https://images.unsplash.com/photo-1594375188248-174763da4d69)',
           backgroundBlendMode: 'overlay',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          backgroundColor: 'rgba(0, 0, 0, 0.7)'
         }}
       >
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
-          <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-32 w-auto" />
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
+          <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-40 w-auto filter drop-shadow-lg" />
         </div>
-        <div className="text-center text-white z-10 px-4">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+        <div className="text-center text-white z-10 px-4 mt-20">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-yellow-400">
             פיצה טעימה עד הבית
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
             מרכיבים טריים, מתכונים מסורתיים ומשלוח מהיר עד דלתך
           </p>
           <Link href="/menu">
-            <Button size="lg" className="text-lg px-8">
+            <Button size="lg" className="text-lg px-8 bg-red-600 hover:bg-red-700 text-white">
               הזמן עכשיו
             </Button>
           </Link>
@@ -34,19 +34,19 @@ export default function Home() {
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">מרכיבים טריים</h3>
+          <h3 className="text-2xl font-bold mb-4 text-red-600">מרכיבים טריים</h3>
           <p className="text-muted-foreground">
             אנחנו משתמשים רק במרכיבים הטריים ביותר
           </p>
         </div>
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">משלוח מהיר</h3>
+          <h3 className="text-2xl font-bold mb-4 text-red-600">משלוח מהיר</h3>
           <p className="text-muted-foreground">
             פיצה חמה וטרייה מגיעה עד דלתך
           </p>
         </div>
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">הזמנה בהתאמה אישית</h3>
+          <h3 className="text-2xl font-bold mb-4 text-red-600">הזמנה בהתאמה אישית</h3>
           <p className="text-muted-foreground">
             התאם את הפיצה שלך עם התוספות האהובות עליך
           </p>
@@ -54,31 +54,31 @@ export default function Home() {
       </div>
 
       {/* Gallery Section */}
-      <div className="bg-accent/50 py-16">
+      <div className="bg-black py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            הפיצות הפופולריות שלנו
+          <h2 className="text-3xl font-bold text-center mb-8 text-yellow-400">
+            הפיצות שלנו
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <img
               src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca"
               alt="פיצה מרגריטה"
-              className="rounded-lg aspect-square object-cover"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
             />
             <img
               src="https://images.unsplash.com/photo-1585238342024-78d387f4a707"
               alt="פיצה ארבע גבינות"
-              className="rounded-lg aspect-square object-cover"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
             />
             <img
               src="https://images.unsplash.com/photo-1571066811602-716837d681de"
               alt="פיצה פטריות"
-              className="rounded-lg aspect-square object-cover"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
             />
             <img
               src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e"
               alt="פיצה ירקות"
-              className="rounded-lg aspect-square object-cover"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
             />
           </div>
         </div>
