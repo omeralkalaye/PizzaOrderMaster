@@ -13,12 +13,9 @@ export default function Home() {
           backgroundColor: 'rgba(0, 0, 0, 0.7)'
         }}
       >
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
-          <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-40 w-auto filter drop-shadow-lg" />
-        </div>
-        <div className="text-center text-white z-10 px-4 mt-20">
+        <div className="text-center text-white z-10 px-4">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-yellow-400">
-            פיצה טעימה עד הבית
+            פיצה פצץ קדימה
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
             מרכיבים טריים, מתכונים מסורתיים ומשלוח מהיר עד דלתך
