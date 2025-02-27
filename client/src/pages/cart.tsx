@@ -11,8 +11,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { PizzaCard } from "@/components/pizza-card";
 import type { CartItem } from "@/types/cart";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
@@ -27,6 +30,9 @@ export default function Cart() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
+  const [currentPizzaIndex, setCurrentPizzaIndex] = useState(0); //Added state for tab index
+  const selectedPizzas = [editingItem]; //Added array to represent pizzas in tabs, needs further refinement
+
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -113,80 +119,90 @@ export default function Cart() {
                 const hasVeganCheese = item.isVeganCheese;
 
                 return (
-                  <>
-                    <div 
-                      key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`}
-                      className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-accent/5"
-                    >
-                      <div onClick={() => setEditingItem(item)}>
-                        <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
-                        {hasSpecialSauce && (
-                          <p className="text-sm text-muted-foreground">רוטב שמנת</p>
-                        )}
-                        {hasVeganCheese && (
-                          <p className="text-sm text-muted-foreground">גבינה טבעונית</p>
-                        )}
-                        {hasToppings && (
-                          <p className="text-sm text-muted-foreground">
-                            {toppingsCount} תוספות
-                          </p>
-                        )}
+                  <div 
+                    key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`}
+                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-accent/5"
+                  >
+                    <div onClick={() => setEditingItem(item)}>
+                      <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
+                      {hasSpecialSauce && (
+                        <p className="text-sm text-muted-foreground">רוטב שמנת</p>
+                      )}
+                      {hasVeganCheese && (
+                        <p className="text-sm text-muted-foreground">גבינה טבעונית</p>
+                      )}
+                      {hasToppings && (
                         <p className="text-sm text-muted-foreground">
-                          ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
+                          {toppingsCount} תוספות
                         </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            dispatch({
-                              type: "UPDATE_QUANTITY",
-                              payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
-                            });
-                          }}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            dispatch({
-                              type: "UPDATE_QUANTITY",
-                              payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
-                            });
-                          }}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId });
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
+                      </p>
                     </div>
-                    {editingItem?.pizzaId === item.pizzaId && (
-                      <PizzaCard
-                        pizza={item.pizza}
-                        defaultSize={item.size}
-                        existingItem={item}
-                        onUpdate={handleUpdateItem}
-                      />
-                    )}
-                  </>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({
+                            type: "UPDATE_QUANTITY",
+                            payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
+                          });
+                        }}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({
+                            type: "UPDATE_QUANTITY",
+                            payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
+                          });
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId });
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 );
               })}
             </div>
+
+            {editingItem && (
+              <Dialog open={!!editingItem} onOpenChange={setEditingItem}>
+                <DialogHeader>
+                  <DialogTitle>עריכת פריט</DialogTitle>
+                  <DialogClose />
+                </DialogHeader>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <PizzaCard 
+                    pizza={editingItem.pizza} 
+                    defaultSize={editingItem.size} 
+                    existingItem={editingItem} 
+                    onUpdate={handleUpdateItem} 
+                  />
+                </DialogContent>
+                <DialogFooter>
+                  <Button onClick={() => setEditingItem(null)}>סגור</Button>
+                </DialogFooter>
+              </Dialog>
+            )}
 
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
