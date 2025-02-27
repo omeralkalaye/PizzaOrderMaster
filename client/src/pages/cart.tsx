@@ -131,7 +131,7 @@ export default function Cart() {
                 const hasVeganCheese = item.isVeganCheese;
 
                 return (
-                  <div 
+                  <div
                     key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`}
                     className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-accent/5"
                     onClick={() => setEditingItem(item)}
@@ -257,15 +257,15 @@ export default function Cart() {
                         <RadioGroup
                           onValueChange={field.onChange}
                           value={field.value}
-                          className="flex gap-4"
+                          className="flex flex-col gap-4"
                         >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="delivery" id="delivery" />
+                          <div className="flex items-center justify-end space-x-reverse space-x-2">
                             <label htmlFor="delivery">משלוח</label>
+                            <RadioGroupItem value="delivery" id="delivery" />
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="pickup" id="pickup" />
+                          <div className="flex items-center justify-end space-x-reverse space-x-2">
                             <label htmlFor="pickup">איסוף עצמי</label>
+                            <RadioGroupItem value="pickup" id="pickup" />
                           </div>
                         </RadioGroup>
                       </FormControl>
