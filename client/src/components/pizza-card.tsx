@@ -216,7 +216,7 @@ export function PizzaCard({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex justify-between items-center">
+        <CardTitle className="flex justify-between items-center text-center">
           <span>{pizza.name}</span>
           <span className="text-lg">
             ₪{(pizza.price / 100).toFixed(2)}
@@ -231,7 +231,7 @@ export function PizzaCard({
             className="object-cover w-full h-full"
           />
         </div>
-        <p className="text-sm text-muted-foreground">{pizza.description}</p>
+        <p className="text-sm text-muted-foreground text-center">{pizza.description}</p>
       </CardContent>
       <CardFooter>
         {isAdmin ? (

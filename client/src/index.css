@@ -12,7 +12,8 @@
     direction: rtl;
   }
 
-  h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, select {
+  /* Text alignment for forms and content */
+  input, textarea, select, .text-content {
     @apply text-right;
   }
 }
