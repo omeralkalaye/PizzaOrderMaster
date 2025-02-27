@@ -70,32 +70,16 @@ export class MemStorage implements IStorage {
       this.toppings.set(id, { ...topping, id });
     });
 
-    // Add default pizzas
-    const defaultPizzas: InsertPizza[] = [
-      {
-        name: "מרגריטה",
-        description: "רוטב עגבניות, גבינת מוצרלה ובזיליקום טרי",
-        price: 4000, // 40 ₪ for size S
-        imageUrl: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
-        available: true,
-      },
-      {
-        name: "ארבע גבינות",
-        description: "מוצרלה, פרמזן, גורגונזולה וריקוטה",
-        price: 4500,
-        imageUrl: "https://images.unsplash.com/photo-1585238342024-78d387f4a707",
-        available: true,
-      },
-      {
-        name: "פטריות",
-        description: "רוטב עגבניות, מוצרלה ופטריות טריות",
-        price: 4200,
-        imageUrl: "https://images.unsplash.com/photo-1571066811602-716837d681de",
-        available: true,
-      },
-    ];
+    // Add base pizza
+    const basePizza: InsertPizza = {
+      name: "פיצה קלאסית",
+      description: "פיצה עם רוטב עגבניות וגבינת מוצרלה",
+      price: 4000, // 40₪ for size S
+      imageUrl: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
+      available: true,
+    };
 
-    defaultPizzas.forEach(pizza => this.createPizza(pizza));
+    this.createPizza(basePizza);
   }
 
   async getPizzas(): Promise<Pizza[]> {

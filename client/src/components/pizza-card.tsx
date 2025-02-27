@@ -32,11 +32,12 @@ interface PizzaCardProps {
   pizza: Pizza;
   isAdmin?: boolean;
   onEdit?: (pizza: Pizza) => void;
+  defaultSize?: PizzaSize;
 }
 
-export function PizzaCard({ pizza, isAdmin, onEdit }: PizzaCardProps) {
+export function PizzaCard({ pizza, isAdmin, onEdit, defaultSize = "M" }: PizzaCardProps) {
   const { dispatch } = useCart();
-  const [size, setSize] = useState<PizzaSize>("M");
+  const [size, setSize] = useState<PizzaSize>(defaultSize);
   const [layout, setLayout] = useState<ToppingLayout>("full");
   const [selectedToppings, setSelectedToppings] = useState<number[][]>([[]]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -170,7 +171,7 @@ export function PizzaCard({ pizza, isAdmin, onEdit }: PizzaCardProps) {
                   <TabsList className="w-full justify-start">
                     {Array.from({ length: sections }, (_, i) => (
                       <TabsTrigger key={i} value={i.toString()}>
-                        {layout === "full" ? "תוספות" : 
+                        {layout === "full" ? "תוספות" :
                          layout === "half" ? `חצי ${i + 1}` :
                          `רבע ${i + 1}`}
                       </TabsTrigger>

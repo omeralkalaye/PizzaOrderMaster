@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { PizzaCard } from "@/components/pizza-card";
-import { Pizza } from "@shared/schema";
+import { Pizza, pizzaSizes } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Menu() {
@@ -24,12 +24,26 @@ export default function Menu() {
     );
   }
 
+  const basePizza = pizzas?.[0];
+
+  if (!basePizza) {
+    return null;
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">התפריט שלנו</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {pizzas?.map((pizza) => (
-          <PizzaCard key={pizza.id} pizza={pizza} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Object.entries(pizzaSizes).map(([size, { name, priceMultiplier }]) => (
+          <PizzaCard 
+            key={size} 
+            pizza={{
+              ...basePizza,
+              name: `פיצה ${name}`,
+              price: Math.round(basePizza.price * priceMultiplier)
+            }}
+            defaultSize={size as "S" | "M" | "L" | "XL"}
+          />
         ))}
       </div>
     </div>
