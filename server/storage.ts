@@ -1,6 +1,34 @@
-import { Pizza, InsertPizza, Order, InsertOrder, OrderStatus, Topping, InsertTopping } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import {
+  users,
+  pizzas,
+  toppings,
+  orders,
+  paymentMethods,
+  type Pizza,
+  type InsertPizza,
+  type Order,
+  type InsertOrder,
+  type Topping,
+  type InsertTopping,
+  type User,
+  type InsertUser,
+  type PaymentMethod,
+  type InsertPaymentMethod,
+  OrderStatus,
+} from "@shared/schema";
+
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
+  // User operations
+  getUser(id: number): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+
   // Pizza operations
   getPizzas(): Promise<Pizza[]>;
   getPizza(id: number): Promise<Pizza | undefined>;
@@ -16,125 +44,116 @@ export interface IStorage {
   getOrder(id: number): Promise<Order | undefined>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrderStatus(id: number, status: OrderStatus): Promise<Order | undefined>;
+
+  // Payment method operations
+  createPaymentMethod(paymentMethod: InsertPaymentMethod): Promise<PaymentMethod>;
+  getPaymentMethods(userId: number): Promise<PaymentMethod[]>;
+
+  // Session store
+  sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private pizzas: Map<number, Pizza>;
-  private toppings: Map<number, Topping>;
-  private orders: Map<number, Order>;
-  private pizzaId: number = 1;
-  private toppingId: number = 1;
-  private orderId: number = 1;
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.Store;
 
   constructor() {
-    this.pizzas = new Map();
-    this.toppings = new Map();
-    this.orders = new Map();
-
-    // Add default toppings
-    const defaultToppings: InsertTopping[] = [
-      {
-        name: "גבינה כפולה",
-        price: 600,
-        imageUrl: "https://example.com/mozzarella.jpg",
-        available: true,
+    this.sessionStore = new PostgresSessionStore({
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
       },
-      {
-        name: "פטריות",
-        price: 400,
-        imageUrl: "https://example.com/mushrooms.jpg",
-        available: true,
-      },
-      {
-        name: "בצל",
-        price: 300,
-        imageUrl: "https://example.com/onion.jpg",
-        available: true,
-      },
-      {
-        name: "זיתים שחורים",
-        price: 400,
-        imageUrl: "https://example.com/olives.jpg",
-        available: true,
-      },
-      {
-        name: "פלפל",
-        price: 300,
-        imageUrl: "https://example.com/pepper.jpg",
-        available: true,
-      },
-    ];
-
-    defaultToppings.forEach(topping => {
-      const id = this.toppingId++;
-      this.toppings.set(id, { ...topping, id });
+      createTableIfMissing: true,
     });
-
-    // Add base pizza
-    const basePizza: InsertPizza = {
-      name: "פיצה קלאסית",
-      description: "פיצה עם רוטב עגבניות וגבינת מוצרלה",
-      price: 4000, // 40₪ for size S
-      imageUrl: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
-      available: true,
-    };
-
-    this.createPizza(basePizza);
   }
 
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+
+  // Pizza operations
   async getPizzas(): Promise<Pizza[]> {
-    return Array.from(this.pizzas.values());
+    return db.select().from(pizzas);
   }
 
   async getPizza(id: number): Promise<Pizza | undefined> {
-    return this.pizzas.get(id);
+    const [pizza] = await db.select().from(pizzas).where(eq(pizzas.id, id));
+    return pizza;
   }
 
   async createPizza(pizza: InsertPizza): Promise<Pizza> {
-    const id = this.pizzaId++;
-    const newPizza = { ...pizza, id };
-    this.pizzas.set(id, newPizza);
+    const [newPizza] = await db.insert(pizzas).values(pizza).returning();
     return newPizza;
   }
 
   async updatePizza(id: number, pizza: Partial<InsertPizza>): Promise<Pizza | undefined> {
-    const existing = this.pizzas.get(id);
-    if (!existing) return undefined;
-    const updated = { ...existing, ...pizza };
-    this.pizzas.set(id, updated);
-    return updated;
+    const [updatedPizza] = await db
+      .update(pizzas)
+      .set(pizza)
+      .where(eq(pizzas.id, id))
+      .returning();
+    return updatedPizza;
   }
 
+  // Topping operations
   async getToppings(): Promise<Topping[]> {
-    return Array.from(this.toppings.values());
+    return db.select().from(toppings);
   }
 
   async getTopping(id: number): Promise<Topping | undefined> {
-    return this.toppings.get(id);
+    const [topping] = await db.select().from(toppings).where(eq(toppings.id, id));
+    return topping;
   }
 
+  // Order operations
   async getOrders(): Promise<Order[]> {
-    return Array.from(this.orders.values());
+    return db.select().from(orders);
   }
 
   async getOrder(id: number): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order;
   }
 
   async createOrder(order: InsertOrder): Promise<Order> {
-    const id = this.orderId++;
-    const newOrder = { ...order, id, createdAt: new Date() };
-    this.orders.set(id, newOrder);
+    const [newOrder] = await db.insert(orders).values(order).returning();
     return newOrder;
   }
 
   async updateOrderStatus(id: number, status: OrderStatus): Promise<Order | undefined> {
-    const existing = this.orders.get(id);
-    if (!existing) return undefined;
-    const updated = { ...existing, status };
-    this.orders.set(id, updated);
-    return updated;
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({ status })
+      .where(eq(orders.id, id))
+      .returning();
+    return updatedOrder;
+  }
+
+  // Payment method operations
+  async createPaymentMethod(paymentMethod: InsertPaymentMethod): Promise<PaymentMethod> {
+    const [newPaymentMethod] = await db
+      .insert(paymentMethods)
+      .values(paymentMethod)
+      .returning();
+    return newPaymentMethod;
+  }
+
+  async getPaymentMethods(userId: number): Promise<PaymentMethod[]> {
+    return db
+      .select()
+      .from(paymentMethods)
+      .where(eq(paymentMethods.userId, userId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
