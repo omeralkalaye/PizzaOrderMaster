@@ -291,13 +291,13 @@ export function PizzaCard({
                 </div>
 
                 {/* סוג בצק */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
                   <Switch
                     id={`thin-dough-${currentPizzaIndex}`}
                     checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
                     onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
                   />
-                  <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
                 </div>
 
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
