@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { PizzaCard } from "@/components/pizza-card";
+import { GarlicBreadCard } from "@/components/garlic-bread-card";
 import { Category, MenuItem, itemSizes } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -65,9 +65,9 @@ export default function GarlicBreadMenu() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {Object.entries(itemSizes).map(([size, { name, priceMultiplier }]) => (
-          <PizzaCard
+          <GarlicBreadCard
             key={`${baseGarlicBread.id}-${size}`}
-            pizza={{
+            item={{
               ...baseGarlicBread,
               name: `לחם שום ${name}`,
               price: Math.round(baseGarlicBread.price * priceMultiplier)

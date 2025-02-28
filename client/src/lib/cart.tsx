@@ -5,6 +5,7 @@ interface CartItem extends PizzaOrderItem {
   pizza: Pizza;
   isCreamSauce?: boolean;
   isVeganCheese?: boolean;
+  isGratin?: boolean; // אופציית הקרמה עבור לחם שום
 }
 
 interface CartState {
@@ -95,12 +96,15 @@ export function calculateTotal(items: CartItem[]): number {
       itemTotal += 500; // 5₪ for cream sauce
     }
 
+    // Add gratin price if selected (for garlic bread)
+    if (item.isGratin) {
+      itemTotal += 300; // 3₪ for gratin
+    }
+
     // Add toppings price
     item.toppingLayout.sections.forEach(section => {
       section.forEach(toppingId => {
-        // Here you would need to get the topping price from somewhere
-        // For now, we'll use a fixed price of 5₪ per topping
-        itemTotal += 500;
+        itemTotal += 500; // 5₪ per topping
       });
     });
 
