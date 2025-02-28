@@ -8,11 +8,11 @@ export default function Home() {
       <div className="min-h-[70vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
         <div className="text-center px-4">
           {/* לוגו גדול */}
-          <div className="h-48 md:h-72 flex items-center justify-center mb-12">
+          <div className="h-40 flex items-center justify-center mb-20">
             <img 
               src="/logo.png" 
               alt="פיצה פצץ קדימה" 
-              className="w-64 md:w-96 mx-auto animate-[bounce_2s_ease-in-out_infinite]"
+              className="w-40 md:w-56 mx-auto"
             />
           </div>
 
