@@ -5,14 +5,16 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="h-[70vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
-        <div className="text-center px-4">
+      <div className="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 pt-16">
+        <div className="text-center px-4 mt-8">
           {/* לוגו גדול */}
-          <img 
-            src="/logo.png" 
-            alt="פיצה פצץ קדימה" 
-            className="w-64 md:w-96 mx-auto mb-8 animate-bounce"
-          />
+          <div className="h-64 md:h-96 flex items-center justify-center mb-8">
+            <img 
+              src="/logo.png" 
+              alt="פיצה פצץ קדימה" 
+              className="w-64 md:w-96 mx-auto animate-[bounce_2s_ease-in-out_infinite]"
+            />
+          </div>
 
           {/* כפתור הזמנה מעוצב */}
           <Link href="/menu">
@@ -48,7 +50,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Gallery Section - עם רקע לבן במקום שחור */}
+      {/* Gallery Section */}
       <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8 text-red-600">
