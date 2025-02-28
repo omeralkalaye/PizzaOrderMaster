@@ -92,6 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
   } = useQuery<User>({
     queryKey: ["/api/user"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/user");
+      if (res.status === 401) return null;
+      return res.json();
+    },
     retry: false,
   });
 
