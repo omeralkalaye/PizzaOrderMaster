@@ -19,6 +19,7 @@ import {
 import { Minus, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PastryCardProps {
   item: MenuItem;
@@ -32,14 +33,15 @@ export function PastryCard({ item }: PastryCardProps) {
   const [smallSauce, setSmallSauce] = useState(0); // כמות רסק קטן
   const [largeSauce, setLargeSauce] = useState(0); // כמות רסק גדול
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
+
+  // מערך של מרכיבים מוסרים לכל פריט בנפרד
+  const [itemsRemovedIngredients, setItemsRemovedIngredients] = useState<string[][]>([[]]);
 
   // מחירי תוספות
   const EXTRA_SPICY_PRICE = 200; // 2₪ לתוספת חריף
   const SMALL_SAUCE_PRICE = 300; // 3₪ לרסק קטן
   const LARGE_SAUCE_PRICE = 500; // 5₪ לרסק גדול
-
-  // מרכיבים שניתן להסיר לפי סוג המאפה
-  const [removedIngredients, setRemovedIngredients] = useState<string[]>([]);
 
   const getAvailableIngredients = () => {
     switch (item.name) {
@@ -63,37 +65,52 @@ export function PastryCard({ item }: PastryCardProps) {
   };
 
   const updateQuantity = (newQuantity: number) => {
-    setQuantity(Math.max(1, newQuantity));
+    const currentQuantity = Math.max(1, newQuantity);
+    setQuantity(currentQuantity);
+
+    // עדכון מערך המרכיבים המוסרים בהתאם לכמות החדשה
+    setItemsRemovedIngredients(current => {
+      if (currentQuantity > current.length) {
+        // הוספת מערכים ריקים עבור הפריטים החדשים
+        return [...current, ...Array(currentQuantity - current.length).fill([])];
+      } else {
+        // הסרת מערכים עודפים
+        return current.slice(0, currentQuantity);
+      }
+    });
   };
 
   const calculateTotalPrice = () => {
-    const basePrice = item.price;
+    const basePrice = item.price * quantity;
     const extraSpicyTotal = extraSpicy * EXTRA_SPICY_PRICE;
     const smallSauceTotal = smallSauce * SMALL_SAUCE_PRICE;
     const largeSauceTotal = largeSauce * LARGE_SAUCE_PRICE;
-    return (basePrice + extraSpicyTotal + smallSauceTotal + largeSauceTotal) * quantity;
+    return basePrice + extraSpicyTotal + smallSauceTotal + largeSauceTotal;
   };
 
   const handleAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        pizzaId: item.id,
-        pizza: item,
-        size: "M",
-        quantity,
-        toppingLayout: {
-          layout: "full",
-          sections: [[]]
+    // הוספת פריט נפרד עבור כל כמות, עם ההגדרות הייחודיות שלו
+    for (let i = 0; i < quantity; i++) {
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          pizzaId: item.id,
+          pizza: item,
+          size: "M",
+          quantity: 1, // כל פריט בנפרד
+          toppingLayout: {
+            layout: "full",
+            sections: [[]]
+          },
+          doughType: "thick",
+          isSpicy,
+          extraSpicy,
+          smallSauce,
+          largeSauce,
+          removedIngredients: itemsRemovedIngredients[i],
         },
-        doughType: "thick",
-        isSpicy,
-        extraSpicy,
-        smallSauce,
-        largeSauce,
-        removedIngredients,
-      },
-    });
+      });
+    }
     setIsDialogOpen(false);
     resetForm();
   };
@@ -104,15 +121,21 @@ export function PastryCard({ item }: PastryCardProps) {
     setExtraSpicy(0);
     setSmallSauce(0);
     setLargeSauce(0);
-    setRemovedIngredients([]);
+    setItemsRemovedIngredients([[]]);
+    setCurrentItemIndex(0);
   };
 
   const toggleIngredient = (ingredient: string) => {
-    setRemovedIngredients(current =>
-      current.includes(ingredient)
-        ? current.filter(i => i !== ingredient)
-        : [...current, ingredient]
-    );
+    setItemsRemovedIngredients(current => {
+      const newItems = [...current];
+      const currentIngredients = newItems[currentItemIndex] || [];
+
+      newItems[currentItemIndex] = currentIngredients.includes(ingredient)
+        ? currentIngredients.filter(i => i !== ingredient)
+        : [...currentIngredients, ingredient];
+
+      return newItems;
+    });
   };
 
   return (
@@ -140,9 +163,9 @@ export function PastryCard({ item }: PastryCardProps) {
           <DialogTrigger asChild>
             <Button className="w-full">בחר</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto my-8">
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
             <DialogHeader>
-              <DialogTitle className="text-center">{item.name}</DialogTitle>
+              <DialogTitle className="text-center">התאם את {item.name} לטעמך</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-6">
@@ -168,99 +191,118 @@ export function PastryCard({ item }: PastryCardProps) {
                 </div>
               </div>
 
-              {/* הסרת מרכיבים */}
-              <div className="space-y-4">
-                <Label className="block mb-2">הסר מרכיבים:</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {getAvailableIngredients().map((ingredient) => (
-                    <div key={ingredient} className="flex items-center justify-between p-2 border rounded">
-                      <Label htmlFor={`remove-${ingredient}`}>{ingredient}</Label>
-                      <Switch
-                        id={`remove-${ingredient}`}
-                        checked={removedIngredients.includes(ingredient)}
-                        onCheckedChange={() => toggleIngredient(ingredient)}
-                      />
-                    </div>
-                  ))}
+              {quantity > 1 && (
+                <div className="space-y-4">
+                  <Label className="block">הגדרות לכל פריט:</Label>
+                  <Tabs value={currentItemIndex.toString()} onValueChange={(value) => setCurrentItemIndex(parseInt(value))}>
+                    <TabsList className="w-full flex flex-row-reverse">
+                      {Array.from({ length: quantity }, (_, index) => (
+                        <TabsTrigger key={index} value={index.toString()}>
+                          פריט {index + 1}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    <TabsContent value={currentItemIndex.toString()}>
+                      {/* הסרת מרכיבים לפריט הנוכחי */}
+                      <div className="space-y-4">
+                        <Label className="block mb-2">הסר מרכיבים:</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {getAvailableIngredients().map((ingredient) => (
+                            <div key={ingredient} className="flex items-center justify-between p-2 border rounded">
+                              <Label htmlFor={`remove-${ingredient}-${currentItemIndex}`}>{ingredient}</Label>
+                              <Switch
+                                id={`remove-${ingredient}-${currentItemIndex}`}
+                                checked={itemsRemovedIngredients[currentItemIndex]?.includes(ingredient)}
+                                onCheckedChange={() => toggleIngredient(ingredient)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
-              </div>
+              )}
 
-              {/* חריף */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <Label htmlFor="spicy">חריף (חינם)</Label>
-                  <Switch
-                    id="spicy"
-                    checked={isSpicy}
-                    onCheckedChange={setIsSpicy}
-                  />
-                </div>
-
-                {isSpicy && (
+              <div className="border-t pt-4">
+                <Label className="block mb-4 text-lg">תוספות משותפות לכל הפריטים:</Label>
+                {/* חריף */}
+                <div className="space-y-4">
                   <div className="flex items-center justify-between flex-row-reverse">
-                    <Label>תוספת חריף (₪2 ליחידה)</Label>
+                    <Label htmlFor="spicy">חריף (חינם)</Label>
+                    <Switch
+                      id="spicy"
+                      checked={isSpicy}
+                      onCheckedChange={setIsSpicy}
+                    />
+                  </div>
+
+                  {isSpicy && (
+                    <div className="flex items-center justify-between flex-row-reverse">
+                      <Label>תוספת חריף (₪2 ליחידה)</Label>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setExtraSpicy(Math.max(0, extraSpicy - 1))}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-8 text-center">{extraSpicy}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setExtraSpicy(extraSpicy + 1)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* רסק נוסף */}
+                <div className="space-y-4 mt-4">
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label>רסק קטן (₪3 ליחידה)</Label>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => setExtraSpicy(Math.max(0, extraSpicy - 1))}
+                        onClick={() => setSmallSauce(Math.max(0, smallSauce - 1))}
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="w-8 text-center">{extraSpicy}</span>
+                      <span className="w-8 text-center">{smallSauce}</span>
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => setExtraSpicy(extraSpicy + 1)}
+                        onClick={() => setSmallSauce(smallSauce + 1)}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* רסק נוסף */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <Label>רסק קטן (₪3 ליחידה)</Label>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setSmallSauce(Math.max(0, smallSauce - 1))}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-8 text-center">{smallSauce}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setSmallSauce(smallSauce + 1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <Label>רסק גדול (₪5 ליחידה)</Label>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setLargeSauce(Math.max(0, largeSauce - 1))}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-8 text-center">{largeSauce}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setLargeSauce(largeSauce + 1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label>רסק גדול (₪5 ליחידה)</Label>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setLargeSauce(Math.max(0, largeSauce - 1))}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-8 text-center">{largeSauce}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setLargeSauce(largeSauce + 1)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
