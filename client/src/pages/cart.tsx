@@ -259,7 +259,7 @@ export default function Cart() {
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
                 <span>₪{(calculateTotal(items) / 100).toFixed(2)}</span>
-                <span>:סה"כ לתשלום</span>
+                <span>:סה"כ לתשלום (ללא שתייה)</span>
               </div>
             </div>
           </div>
@@ -337,43 +337,51 @@ export default function Cart() {
 
                 {/* תפריטי בחירת שתייה */}
                 <div className="space-y-4 border-t pt-4">
-                  <div className="space-y-2">
-                    <Label className="block text-right">שתייה קלה קטנה (₪8)</Label>
-                    <Select value={selectedSmallDrink} onValueChange={setSelectedSmallDrink}>
-                      <SelectTrigger className="w-full text-right">
-                        <SelectValue placeholder="בחר שתייה קלה קטנה" />
-                      </SelectTrigger>
-                      <SelectContent align="end">
-                        <SelectItem value="">ללא</SelectItem>
-                        {DRINKS.small.map(drink => (
-                          <SelectItem key={drink.id} value={drink.id}>
-                            {drink.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <Label className="block text-right text-lg font-medium">הוסף שתייה להזמנה:</Label>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="block text-right mb-2">שתייה קלה קטנה - ₪8</Label>
+                      <Select value={selectedSmallDrink} onValueChange={setSelectedSmallDrink}>
+                        <SelectTrigger className="w-full text-right">
+                          <SelectValue placeholder="בחר שתייה קטנה" />
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                          {DRINKS.small.map(drink => (
+                            <SelectItem key={drink.id} value={drink.id} className="text-right">
+                              {drink.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="block text-right mb-2">שתייה קלה גדולה - ₪12</Label>
+                      <Select value={selectedLargeDrink} onValueChange={setSelectedLargeDrink}>
+                        <SelectTrigger className="w-full text-right">
+                          <SelectValue placeholder="בחר שתייה גדולה" />
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                          {DRINKS.large.map(drink => (
+                            <SelectItem key={drink.id} value={drink.id} className="text-right">
+                              {drink.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="block text-right">שתייה קלה גדולה (₪12)</Label>
-                    <Select value={selectedLargeDrink} onValueChange={setSelectedLargeDrink}>
-                      <SelectTrigger className="w-full text-right">
-                        <SelectValue placeholder="בחר שתייה קלה גדולה" />
-                      </SelectTrigger>
-                      <SelectContent align="end">
-                        <SelectItem value="">ללא</SelectItem>
-                        {DRINKS.large.map(drink => (
-                          <SelectItem key={drink.id} value={drink.id}>
-                            {drink.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {(selectedSmallDrink || selectedLargeDrink) && (
+                    <div className="mt-2 text-sm text-muted-foreground text-right">
+                      תוספת שתייה: ₪{(calculateDrinksTotal() / 100).toFixed(2)}
+                    </div>
+                  )}
                 </div>
 
                 <Button type="submit" className="w-full">
-                  מעבר לתשלום (₪{(calculateFinalTotal() / 100).toFixed(2)})
+                  מעבר לתשלום - ₪{(calculateFinalTotal() / 100).toFixed(2)}
                 </Button>
               </form>
             </Form>
