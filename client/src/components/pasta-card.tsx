@@ -37,7 +37,7 @@ const SAUCE_OPTIONS = [
   { id: "pesto", name: "פסטו", price: 0 },
 ];
 
-const PARMESAN_PRICE = 300; // 3₪ לתוספת פרמז'ן
+const PARMESAN_PRICE = 300; // 3₪ לתוספת אקסטרא פרמז'ן
 
 interface PastaCardProps {
   item: MenuItem;
@@ -137,6 +137,7 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
           />
         </div>
         <p className="text-sm text-muted-foreground text-center">{item.description}</p>
+        <p className="text-sm text-muted-foreground text-center mt-2">* כל המנות מגיעות עם פרמז'ן בצד</p>
       </CardContent>
       <CardFooter>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -198,7 +199,7 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
                         checked={parmesanChoices[index]}
                         onCheckedChange={() => toggleParmesan(index)}
                       />
-                      <Label>פרמז'ן בצד (+ ₪3)</Label>
+                      <Label>אקסטרא פרמז'ן (+ ₪3)</Label>
                     </div>
                   </div>
                 ))}
