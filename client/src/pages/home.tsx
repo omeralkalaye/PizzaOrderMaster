@@ -5,10 +5,10 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 pt-16">
-        <div className="text-center px-4 mt-8">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
+        <div className="text-center px-4">
           {/* לוגו גדול */}
-          <div className="h-64 md:h-96 flex items-center justify-center mb-8">
+          <div className="h-48 md:h-72 flex items-center justify-center mb-12">
             <img 
               src="/logo.png" 
               alt="פיצה פצץ קדימה" 
