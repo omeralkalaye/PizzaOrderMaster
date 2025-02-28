@@ -290,14 +290,36 @@ export function PizzaCard({
                   <Label>כמות מגשים</Label>
                 </div>
 
-                {/* סוג בצק */}
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
-                  <Switch
-                    id={`thin-dough-${currentPizzaIndex}`}
-                    checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
-                    onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
-                  />
+                <div className="space-y-4">
+                  {/* בצק דק */}
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
+                    <Switch
+                      id={`thin-dough-${currentPizzaIndex}`}
+                      checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
+                      onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
+                    />
+                  </div>
+
+                  {/* רוטב שמנת */}
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label htmlFor={`cream-sauce-${currentPizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
+                    <Switch
+                      id={`cream-sauce-${currentPizzaIndex}`}
+                      checked={selectedPizzas[currentPizzaIndex].isCreamSauce}
+                      onCheckedChange={(checked) => updatePizzaSauce(currentPizzaIndex, checked)}
+                    />
+                  </div>
+
+                  {/* גבינה טבעונית */}
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label htmlFor={`vegan-cheese-${currentPizzaIndex}`}>גבינה טבעונית</Label>
+                    <Switch
+                      id={`vegan-cheese-${currentPizzaIndex}`}
+                      checked={selectedPizzas[currentPizzaIndex].isVeganCheese}
+                      onCheckedChange={(checked) => updatePizzaCheese(currentPizzaIndex, checked)}
+                    />
+                  </div>
                 </div>
 
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>

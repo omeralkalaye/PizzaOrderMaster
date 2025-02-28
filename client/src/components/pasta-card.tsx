@@ -229,27 +229,36 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
                       <Label>רוטב למנה {index + 1}</Label>
                     </div>
 
-                    <div className="flex items-center justify-between flex-row-reverse">
-                      <Label>שמנת</Label> {/* Cream Sauce Switch */}
-                      <Switch
-                        checked={creamSauceChoices[index]}
-                        onCheckedChange={() => toggleCreamSauce(index)}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between flex-row-reverse">
-                      <Label>גבינה טבעונית</Label> {/* Vegan Cheese Switch */}
-                      <Switch
-                        checked={veganCheeseChoices[index]}
-                        onCheckedChange={() => toggleVeganCheese(index)}
-                      />
-                    </div>
+                    <div className="space-y-4">
+                      {/* רוטב שמנת */}
+                      <div className="flex items-center justify-between flex-row-reverse">
+                        <Label htmlFor={`cream-sauce-${index}`}>שמנת</Label>
+                        <Switch
+                          id={`cream-sauce-${index}`}
+                          checked={creamSauceChoices[index]}
+                          onCheckedChange={() => toggleCreamSauce(index)}
+                        />
+                      </div>
 
-                    <div className="flex items-center justify-between flex-row-reverse">
-                      <Label>אקסטרא פרמז'ן (+ ₪3)</Label>
-                      <Switch
-                        checked={parmesanChoices[index]}
-                        onCheckedChange={() => toggleParmesan(index)}
-                      />
+                      {/* גבינה טבעונית */}
+                      <div className="flex items-center justify-between flex-row-reverse">
+                        <Label htmlFor={`vegan-cheese-${index}`}>גבינה טבעונית</Label>
+                        <Switch
+                          id={`vegan-cheese-${index}`}
+                          checked={veganCheeseChoices[index]}
+                          onCheckedChange={() => toggleVeganCheese(index)}
+                        />
+                      </div>
+
+                      {/* אקסטרא פרמז'ן */}
+                      <div className="flex items-center justify-between flex-row-reverse">
+                        <Label htmlFor={`parmesan-${index}`}>אקסטרא פרמז'ן (+ ₪3)</Label>
+                        <Switch
+                          id={`parmesan-${index}`}
+                          checked={parmesanChoices[index]}
+                          onCheckedChange={() => toggleParmesan(index)}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
