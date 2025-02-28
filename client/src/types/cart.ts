@@ -17,5 +17,8 @@ export interface CartItem {
   hasParmesan?: boolean; // אופציית פרמז'ן עבור פסטות
   hasBoiledEgg?: boolean; // אופציית ביצה קשה עבור סלט
   isSpicy?: boolean; // אופציית חריף עבור מאפים
-  extraCheese?: boolean; // אופציית תוספת גבינה עבור מאפים
+  extraSpicy?: number; // כמות חריף נוסף בתשלום
+  smallSauce?: number; // כמות רסק קטן
+  largeSauce?: number; // כמות רסק גדול
+  removedIngredients?: string[]; // מרכיבים שהוסרו
 }

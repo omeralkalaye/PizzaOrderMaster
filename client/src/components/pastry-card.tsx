@@ -28,10 +28,39 @@ export function PastryCard({ item }: PastryCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isSpicy, setIsSpicy] = useState(false);
-  const [extraCheese, setExtraCheese] = useState(false);
+  const [extraSpicy, setExtraSpicy] = useState(0); // כמות חריף נוסף בתשלום
+  const [smallSauce, setSmallSauce] = useState(0); // כמות רסק קטן
+  const [largeSauce, setLargeSauce] = useState(0); // כמות רסק גדול
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const EXTRA_CHEESE_PRICE = 300; // 3₪ לתוספת גבינה
+  // מחירי תוספות
+  const EXTRA_SPICY_PRICE = 200; // 2₪ לתוספת חריף
+  const SMALL_SAUCE_PRICE = 300; // 3₪ לרסק קטן
+  const LARGE_SAUCE_PRICE = 500; // 5₪ לרסק גדול
+
+  // מרכיבים שניתן להסיר לפי סוג המאפה
+  const [removedIngredients, setRemovedIngredients] = useState<string[]>([]);
+
+  const getAvailableIngredients = () => {
+    switch (item.name) {
+      case "מלאווח פתוח":
+        return ["ביצה קשה", "רסק עגבניות"];
+      case "מלאווח משובח":
+        return ["ביצה קשה", "רסק עגבניות"];
+      case "מלאווח יווני":
+        return ["ביצה", "רסק", "זיתים שחורים", "בצל", "גבינה בולגרית", "זעתר"];
+      case "מלאווח מעורב":
+        return ["ביצה", "רסק", "גבינה צהובה", "גבינה בולגרית"];
+      case "מלאווח טוניסאי":
+        return ["ביצה", "רסק", "זיתים ירוקים", "טונה"];
+      case "מלאווח הבית":
+        return ["ביצה", "רסק", "גבינה בולגרית", "טונה", "פטריות"];
+      case "ג'חנון":
+        return ["ביצה קשה", "רסק עגבניות"];
+      default:
+        return [];
+    }
+  };
 
   const updateQuantity = (newQuantity: number) => {
     setQuantity(Math.max(1, newQuantity));
@@ -39,8 +68,10 @@ export function PastryCard({ item }: PastryCardProps) {
 
   const calculateTotalPrice = () => {
     const basePrice = item.price;
-    const cheesePrice = extraCheese ? EXTRA_CHEESE_PRICE : 0;
-    return (basePrice + cheesePrice) * quantity;
+    const extraSpicyTotal = extraSpicy * EXTRA_SPICY_PRICE;
+    const smallSauceTotal = smallSauce * SMALL_SAUCE_PRICE;
+    const largeSauceTotal = largeSauce * LARGE_SAUCE_PRICE;
+    return (basePrice + extraSpicyTotal + smallSauceTotal + largeSauceTotal) * quantity;
   };
 
   const handleAddToCart = () => {
@@ -56,16 +87,32 @@ export function PastryCard({ item }: PastryCardProps) {
           sections: [[]]
         },
         doughType: "thick",
-        isCreamSauce: false,
-        isVeganCheese: false,
         isSpicy,
-        extraCheese,
+        extraSpicy,
+        smallSauce,
+        largeSauce,
+        removedIngredients,
       },
     });
     setIsDialogOpen(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setQuantity(1);
     setIsSpicy(false);
-    setExtraCheese(false);
+    setExtraSpicy(0);
+    setSmallSauce(0);
+    setLargeSauce(0);
+    setRemovedIngredients([]);
+  };
+
+  const toggleIngredient = (ingredient: string) => {
+    setRemovedIngredients(current =>
+      current.includes(ingredient)
+        ? current.filter(i => i !== ingredient)
+        : [...current, ingredient]
+    );
   };
 
   return (
@@ -121,10 +168,27 @@ export function PastryCard({ item }: PastryCardProps) {
                 </div>
               </div>
 
+              {/* הסרת מרכיבים */}
               <div className="space-y-4">
-                {/* חריף */}
+                <Label className="block mb-2">הסר מרכיבים:</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {getAvailableIngredients().map((ingredient) => (
+                    <div key={ingredient} className="flex items-center justify-between p-2 border rounded">
+                      <Label htmlFor={`remove-${ingredient}`}>{ingredient}</Label>
+                      <Switch
+                        id={`remove-${ingredient}`}
+                        checked={removedIngredients.includes(ingredient)}
+                        onCheckedChange={() => toggleIngredient(ingredient)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* חריף */}
+              <div className="space-y-4">
                 <div className="flex items-center justify-between flex-row-reverse">
-                  <Label htmlFor="spicy">חריף</Label>
+                  <Label htmlFor="spicy">חריף (חינם)</Label>
                   <Switch
                     id="spicy"
                     checked={isSpicy}
@@ -132,14 +196,72 @@ export function PastryCard({ item }: PastryCardProps) {
                   />
                 </div>
 
-                {/* תוספת גבינה */}
+                {isSpicy && (
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label>תוספת חריף (₪2 ליחידה)</Label>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setExtraSpicy(Math.max(0, extraSpicy - 1))}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-8 text-center">{extraSpicy}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setExtraSpicy(extraSpicy + 1)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* רסק נוסף */}
+              <div className="space-y-4">
                 <div className="flex items-center justify-between flex-row-reverse">
-                  <Label htmlFor="extra-cheese">תוספת גבינה (+ ₪3)</Label>
-                  <Switch
-                    id="extra-cheese"
-                    checked={extraCheese}
-                    onCheckedChange={setExtraCheese}
-                  />
+                  <Label>רסק קטן (₪3 ליחידה)</Label>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setSmallSauce(Math.max(0, smallSauce - 1))}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center">{smallSauce}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setSmallSauce(smallSauce + 1)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <Label>רסק גדול (₪5 ליחידה)</Label>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setLargeSauce(Math.max(0, largeSauce - 1))}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center">{largeSauce}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setLargeSauce(largeSauce + 1)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
