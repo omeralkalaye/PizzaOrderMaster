@@ -90,6 +90,8 @@ export default function Menu() {
                     setLocation("/pizza-menu");
                   } else if (category.name === "לחם שום") {
                     setLocation("/garlic-bread-menu");
+                  } else if (category.name === "פסטות" || category.name === "רביולי") {
+                    setLocation("/pasta-menu");
                   }
                 }}
               >

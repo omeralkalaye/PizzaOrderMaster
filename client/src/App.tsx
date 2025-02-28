@@ -10,6 +10,7 @@ import Home from "@/pages/home";
 import Menu from "@/pages/menu";
 import PizzaMenu from "@/pages/pizza-menu";
 import GarlicBreadMenu from "@/pages/garlic-bread-menu";
+import PastaMenu from "@/pages/pasta-menu";
 import Cart from "@/pages/cart";
 import Payment from "@/pages/payment";
 import Auth from "@/pages/auth";
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/menu" component={Menu} />
       <Route path="/pizza-menu" component={PizzaMenu} />
       <Route path="/garlic-bread-menu" component={GarlicBreadMenu} />
+      <Route path="/pasta-menu" component={PastaMenu} />
       <Route path="/cart" component={Cart} />
       <Route path="/payment" component={Payment} />
       <Route path="/auth" component={Auth} />
