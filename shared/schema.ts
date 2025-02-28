@@ -39,6 +39,10 @@ export const menuItems = pgTable("menu_items", {
   isCustomizable: boolean("is_customizable").notNull().default(false),
 });
 
+// Add these back after the menuItems definition
+export type Pizza = typeof menuItems.$inferSelect;
+export type InsertPizza = z.infer<typeof insertMenuItemSchema>;
+
 // תוספות (לפיצות, סלטים, פסטות)
 export const toppings = pgTable("toppings", {
   id: serial("id").primaryKey(),
@@ -89,6 +93,8 @@ export const insertMenuItemSchema = createInsertSchema(menuItems).omit({ id: tru
 export const insertToppingSchema = createInsertSchema(toppings).omit({ id: true });
 export const insertSauceSchema = createInsertSchema(sauces).omit({ id: true });
 export const insertBeverageSchema = createInsertSchema(beverages).omit({ id: true });
+// Add this with the other insert schemas
+export const insertPizzaSchema = insertMenuItemSchema;
 
 // Types
 export type Category = typeof categories.$inferSelect;
@@ -123,7 +129,6 @@ export const paymentMethods = pgTable("payment_methods", {
   expiryYear: varchar("expiry_year", { length: 2 }).notNull(),
   isDefault: boolean("is_default").notNull().default(false),
 });
-
 
 export type OrderStatus = "pending" | "preparing" | "ready" | "delivered";
 
@@ -179,8 +184,6 @@ export const paymentMethodsRelations = relations(paymentMethods, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertPizzaSchema = createInsertSchema(menuItems).omit({ id: true });
-export const insertToppingSchema = createInsertSchema(toppings).omit({ id: true });
 export const insertOrderSchema = createInsertSchema(orders)
   .omit({ id: true, createdAt: true })
   .extend({
@@ -213,10 +216,6 @@ export const insertPaymentMethodSchema = createInsertSchema(paymentMethods)
   });
 
 // Types
-export type Pizza = typeof menuItems.$inferSelect;
-export type InsertPizza = z.infer<typeof insertPizzaSchema>;
-export type Topping = typeof toppings.$inferSelect;
-export type InsertTopping = z.infer<typeof insertToppingSchema>;
 export type Order = typeof orders.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type PizzaOrderItem = z.infer<typeof pizzaOrderItemSchema>;
