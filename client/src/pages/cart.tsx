@@ -6,8 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from 'react';
@@ -76,6 +74,7 @@ export default function Cart() {
       deliveryType: "delivery",
       address: "",
     },
+    mode: "onSubmit", // שינוי זה יגרום לולידציה להתבצע רק בהגשת הטופס
   });
 
   const deliveryType = form.watch("deliveryType");
@@ -128,7 +127,6 @@ export default function Cart() {
       return;
     }
 
-    // הוספת השתייה לעגלה
     selectedDrinks.forEach(drink => {
       dispatch({
         type: "ADD_ITEM",
@@ -268,6 +266,92 @@ export default function Cart() {
           </div>
 
           <div>
+            {/* תפריטי בחירת שתייה */}
+            <div className="space-y-4 mb-6">
+              <Label className="block text-right text-lg font-medium">הוסף שתייה להזמנה:</Label>
+
+              <div className="space-y-4">
+                <div>
+                  <Label className="block text-right mb-2 text-lg font-medium border-b pb-2">הוספת שתייה קטנה - ₪8</Label>
+                  <Select onValueChange={(value) => handleAddDrink("small", value)}>
+                    <SelectTrigger className="w-full text-right">
+                      <SelectValue placeholder="בחר שתייה בגודל קטן" />
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      {DRINKS.small.map(drink => (
+                        <SelectItem key={drink.id} value={drink.id} className="text-right">
+                          {drink.name} (קטן)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="block text-right mb-2 text-lg font-medium border-b pb-2">הוספת שתייה גדולה - ₪12</Label>
+                  <Select onValueChange={(value) => handleAddDrink("large", value)}>
+                    <SelectTrigger className="w-full text-right">
+                      <SelectValue placeholder="בחר שתייה בגודל גדול" />
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      {DRINKS.large.map(drink => (
+                        <SelectItem key={drink.id} value={drink.id} className="text-right">
+                          {drink.name} (גדול)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedDrinks.length > 0 && (
+                  <div className="space-y-2 mt-4">
+                    <Label className="block text-right text-lg font-medium border-b pb-2">שתייה שנבחרה:</Label>
+                    <div className="space-y-2">
+                      {selectedDrinks.map((drink, index) => (
+                        <div key={`${drink.id}-${index}`} className="flex items-center justify-between p-2 border rounded">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleRemoveDrink(index)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <div className="flex items-center space-x-2 mx-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleUpdateDrinkQuantity(index, -1)}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <span className="w-8 text-center">{drink.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleUpdateDrinkQuantity(index, 1)}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div>{drink.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {drink.size === "small" ? "קטנה" : "גדולה"} - ₪{(drink.price * drink.quantity / 100).toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-sm text-muted-foreground text-right">
+                      סה"כ שתייה: ₪{(calculateDrinksTotal() / 100).toFixed(2)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
@@ -337,93 +421,6 @@ export default function Cart() {
                     )}
                   />
                 )}
-
-                {/* תפריטי בחירת שתייה */}
-                <div className="space-y-4 border-t pt-4">
-                  <Label className="block text-right text-lg font-medium">הוסף שתייה להזמנה:</Label>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="block text-right mb-2 text-lg font-medium border-b pb-2">הוספת שתייה קטנה - ₪8</Label>
-                      <Select onValueChange={(value) => handleAddDrink("small", value)}>
-                        <SelectTrigger className="w-full text-right">
-                          <SelectValue placeholder="בחר שתייה בגודל קטן" />
-                        </SelectTrigger>
-                        <SelectContent align="end">
-                          {DRINKS.small.map(drink => (
-                            <SelectItem key={drink.id} value={drink.id} className="text-right">
-                              {drink.name} (קטן)
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label className="block text-right mb-2 text-lg font-medium border-b pb-2">הוספת שתייה גדולה - ₪12</Label>
-                      <Select onValueChange={(value) => handleAddDrink("large", value)}>
-                        <SelectTrigger className="w-full text-right">
-                          <SelectValue placeholder="בחר שתייה בגודל גדול" />
-                        </SelectTrigger>
-                        <SelectContent align="end">
-                          {DRINKS.large.map(drink => (
-                            <SelectItem key={drink.id} value={drink.id} className="text-right">
-                              {drink.name} (גדול)
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* רשימת השתייה שנבחרה */}
-                    {selectedDrinks.length > 0 && (
-                      <div className="space-y-2 mt-4">
-                        <Label className="block text-right text-lg font-medium border-b pb-2">שתייה שנבחרה:</Label>
-                        <div className="space-y-2">
-                          {selectedDrinks.map((drink, index) => (
-                            <div key={`${drink.id}-${index}`} className="flex items-center justify-between p-2 border rounded">
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  onClick={() => handleRemoveDrink(index)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                                <div className="flex items-center space-x-2 mx-2">
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => handleUpdateDrinkQuantity(index, -1)}
-                                  >
-                                    <Minus className="h-4 w-4" />
-                                  </Button>
-                                  <span className="w-8 text-center">{drink.quantity}</span>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => handleUpdateDrinkQuantity(index, 1)}
-                                  >
-                                    <Plus className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div>{drink.name}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  {drink.size === "small" ? "קטנה" : "גדולה"} - ₪{(drink.price * drink.quantity / 100).toFixed(2)}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="text-sm text-muted-foreground text-right">
-                          סה"כ שתייה: ₪{(calculateDrinksTotal() / 100).toFixed(2)}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 <Button type="submit" className="w-full">
                   מעבר לתשלום - ₪{(calculateFinalTotal() / 100).toFixed(2)}
