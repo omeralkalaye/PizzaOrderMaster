@@ -4,11 +4,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { BakedPotatoCard } from "@/components/baked-potato-card";
+import { SaladCard } from "@/components/salad-card"; // Added import
 
 type MenuData = {
   categories: Category[];
   menuItems: MenuItem[];
-}
+};
 
 const CATEGORY_IMAGES = {
   "פיצות": "https://images.unsplash.com/photo-1513104890138-7c749659a591",
@@ -18,7 +19,7 @@ const CATEGORY_IMAGES = {
   "תפוח אדמה מוקרם": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4",
   "סלטים": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
   "משקאות": "https://images.unsplash.com/photo-1544145945-f90425340c7e",
-  "תוספות חמות": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4" // Added this line
+  "תוספות חמות": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4"
 };
 
 const CATEGORY_DESCRIPTIONS = {
@@ -88,9 +89,14 @@ export default function Menu() {
               return <BakedPotatoCard key={category.id} item={items[0]} />;
             }
 
+            // אם זה סלט, נציג את הכרטיסייה עם אפשרויות הבחירה
+            if (category.name === "סלטים") {
+              return <SaladCard key={category.id} item={items[0]} />; // Added SaladCard rendering
+            }
+
             return (
-              <Card 
-                key={category.id} 
+              <Card
+                key={category.id}
                 className="cursor-pointer hover:bg-accent/5 transition-colors overflow-hidden"
                 onClick={() => {
                   if (category.name === "פיצות") {
@@ -114,8 +120,8 @@ export default function Menu() {
                     <div>
                       <h2 className="text-2xl font-semibold mb-2">{displayName}</h2>
                       <p className="text-muted-foreground">
-                        {CATEGORY_DESCRIPTIONS[imageKey as keyof typeof CATEGORY_DESCRIPTIONS] || 
-                          category.description || 
+                        {CATEGORY_DESCRIPTIONS[imageKey as keyof typeof CATEGORY_DESCRIPTIONS] ||
+                          category.description ||
                           `${items.length} פריטים`}
                       </p>
                     </div>

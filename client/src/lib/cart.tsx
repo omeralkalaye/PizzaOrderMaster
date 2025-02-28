@@ -8,6 +8,7 @@ interface CartItem extends PizzaOrderItem {
   isGratin?: boolean; // אופציית הקרמה עבור לחם שום
   sauceId?: string; // אופציית הרוטב עבור פסטות
   hasParmesan?: boolean; // אופציית פרמז'ן עבור פסטות
+  hasBoiledEgg?: boolean; // אופציית ביצה קשה עבור סלט
 }
 
 interface CartState {
@@ -38,6 +39,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           item.isGratin === action.payload.isGratin &&
           item.sauceId === action.payload.sauceId &&
           item.hasParmesan === action.payload.hasParmesan &&
+          item.hasBoiledEgg === action.payload.hasBoiledEgg &&
           JSON.stringify(item.toppingLayout) === JSON.stringify(action.payload.toppingLayout)
       );
 
@@ -108,6 +110,11 @@ export function calculateTotal(items: CartItem[]): number {
     // Add parmesan price if selected (for pasta)
     if (item.hasParmesan) {
       itemTotal += 300; // 3₪ for parmesan
+    }
+
+    // Add boiled egg price if selected (for salad)
+    if (item.hasBoiledEgg) {
+      itemTotal += 300; // 3₪ for boiled egg
     }
 
     // Add toppings price
