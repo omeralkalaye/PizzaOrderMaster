@@ -142,13 +142,13 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
                 <Label className="block text-right mb-2">בחירת הקרמה:</Label>
                 {gratinChoices.map((isGratin, index) => (
                   <div key={index} className="space-y-4 border p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-row-reverse">
+                      <Label htmlFor={`gratin-${index}`}>לחם שום {index + 1} - הקרמה (+ ₪3)</Label>
                       <Switch
                         id={`gratin-${index}`}
                         checked={isGratin}
                         onCheckedChange={() => toggleGratin(index)}
                       />
-                      <Label htmlFor={`gratin-${index}`}>לחם שום {index + 1} - הקרמה (+ ₪3)</Label>
                     </div>
                   </div>
                 ))}

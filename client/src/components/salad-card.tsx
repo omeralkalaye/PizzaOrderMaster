@@ -203,13 +203,13 @@ export function SaladCard({ item }: SaladCardProps) {
                 <TabsContent key={saladIndex} value={saladIndex.toString()}>
                   <div className="space-y-4">
                     <div className="space-y-4 border p-4 rounded-lg">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between flex-row-reverse">
+                        <Label htmlFor={`boiled-egg-${saladIndex}`}>ביצה קשה (+ ₪3)</Label>
                         <Switch
                           id={`boiled-egg-${saladIndex}`}
                           checked={hasBoiledEgg[saladIndex]}
                           onCheckedChange={() => toggleBoiledEgg(saladIndex)}
                         />
-                        <Label htmlFor={`boiled-egg-${saladIndex}`}>ביצה קשה (+ ₪3)</Label>
                       </div>
                     </div>
 

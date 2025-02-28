@@ -269,7 +269,8 @@ export function PizzaCard({
 
               <div className="space-y-4">
                 {/* כמות מגשים */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse"> {/* Added flex-row-reverse */}
+                  <Label>כמות מגשים</Label>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -287,43 +288,42 @@ export function PizzaCard({
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  <Label>כמות מגשים</Label>
                 </div>
 
                 <div className="space-y-4">
                   {/* בצק דק */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
                     <Switch
                       id={`thin-dough-${currentPizzaIndex}`}
                       checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
                       onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
                     />
-                    <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
                   </div>
 
                   {/* רוטב שמנת */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label htmlFor={`cream-sauce-${currentPizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                     <Switch
                       id={`cream-sauce-${currentPizzaIndex}`}
                       checked={selectedPizzas[currentPizzaIndex].isCreamSauce}
                       onCheckedChange={(checked) => updatePizzaSauce(currentPizzaIndex, checked)}
                     />
-                    <Label htmlFor={`cream-sauce-${currentPizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                   </div>
 
                   {/* גבינה טבעונית */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <Label htmlFor={`vegan-cheese-${currentPizzaIndex}`}>גבינה טבעונית</Label>
                     <Switch
                       id={`vegan-cheese-${currentPizzaIndex}`}
                       checked={selectedPizzas[currentPizzaIndex].isVeganCheese}
                       onCheckedChange={(checked) => updatePizzaCheese(currentPizzaIndex, checked)}
                     />
-                    <Label htmlFor={`vegan-cheese-${currentPizzaIndex}`}>גבינה טבעונית</Label>
                   </div>
                 </div>
 
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
-                  <TabsList className="w-full"> {/* Removed flex-row-reverse */}
+                  <TabsList className="w-full flex flex-row-reverse"> {/* Added flex-row-reverse */}
                     {selectedPizzas.map((_, index) => (
                       <TabsTrigger key={index} value={index.toString()}>
                         מגש {index + 1}
@@ -334,21 +334,21 @@ export function PizzaCard({
                   {selectedPizzas.map((pizzaConfig, pizzaIndex) => (
                     <TabsContent key={pizzaIndex} value={pizzaIndex.toString()}>
                       <div className="space-y-4 mb-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between flex-row-reverse"> {/* Added flex-row-reverse */}
+                          <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                           <Switch
                             id={`cream-sauce-${pizzaIndex}`}
                             checked={pizzaConfig.isCreamSauce}
                             onCheckedChange={(checked) => updatePizzaSauce(pizzaIndex, checked)}
                           />
-                          <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between flex-row-reverse"> {/* Added flex-row-reverse */}
+                          <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
                           <Switch
                             id={`vegan-cheese-${pizzaIndex}`}
                             checked={pizzaConfig.isVeganCheese}
                             onCheckedChange={(checked) => updatePizzaCheese(pizzaIndex, checked)}
                           />
-                          <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
                         </div>
                       </div>
 
@@ -370,7 +370,7 @@ export function PizzaCard({
                       </div>
 
                       <Tabs defaultValue="0" className="w-full">
-                        <TabsList className="w-full"> {/*Removed flex-row-reverse*/}
+                        <TabsList className="w-full flex flex-row-reverse"> {/* Added flex-row-reverse */}
                           {Array.from({ length: sections }, (_, i) => (
                             <TabsTrigger key={i} value={i.toString()}>
                               {pizzaConfig.layout === "full" ? "תוספות" :
