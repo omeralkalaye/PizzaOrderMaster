@@ -344,15 +344,15 @@ export default function Cart() {
 
                   <div className="space-y-4">
                     <div>
-                      <Label className="block text-right mb-2">שתייה קלה קטנה - ₪8</Label>
+                      <Label className="block text-right mb-2 text-lg font-medium border-b pb-2">הוספת שתייה קטנה - ₪8</Label>
                       <Select onValueChange={(value) => handleAddDrink("small", value)}>
                         <SelectTrigger className="w-full text-right">
-                          <SelectValue placeholder="בחר שתייה קטנה" />
+                          <SelectValue placeholder="בחר שתייה בגודל קטן" />
                         </SelectTrigger>
                         <SelectContent align="end">
                           {DRINKS.small.map(drink => (
                             <SelectItem key={drink.id} value={drink.id} className="text-right">
-                              {drink.name}
+                              {drink.name} (קטן)
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -360,15 +360,15 @@ export default function Cart() {
                     </div>
 
                     <div>
-                      <Label className="block text-right mb-2">שתייה קלה גדולה - ₪12</Label>
+                      <Label className="block text-right mb-2 text-lg font-medium border-b pb-2">הוספת שתייה גדולה - ₪12</Label>
                       <Select onValueChange={(value) => handleAddDrink("large", value)}>
                         <SelectTrigger className="w-full text-right">
-                          <SelectValue placeholder="בחר שתייה גדולה" />
+                          <SelectValue placeholder="בחר שתייה בגודל גדול" />
                         </SelectTrigger>
                         <SelectContent align="end">
                           {DRINKS.large.map(drink => (
                             <SelectItem key={drink.id} value={drink.id} className="text-right">
-                              {drink.name}
+                              {drink.name} (גדול)
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -378,7 +378,7 @@ export default function Cart() {
                     {/* רשימת השתייה שנבחרה */}
                     {selectedDrinks.length > 0 && (
                       <div className="space-y-2 mt-4">
-                        <Label className="block text-right">שתייה שנבחרה:</Label>
+                        <Label className="block text-right text-lg font-medium border-b pb-2">שתייה שנבחרה:</Label>
                         <div className="space-y-2">
                           {selectedDrinks.map((drink, index) => (
                             <div key={`${drink.id}-${index}`} className="flex items-center justify-between p-2 border rounded">
