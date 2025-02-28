@@ -50,12 +50,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
   const [sauceChoices, setSauceChoices] = useState<string[]>(["cream"]);
   const [parmesanChoices, setParmesanChoices] = useState<boolean[]>([false]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [creamSauceChoices, setCreamSauceChoices] = useState<boolean[]>(
-    Array(1).fill(true)
-  ); // Added for cream sauce switch
-  const [veganCheeseChoices, setVeganCheeseChoices] = useState<boolean[]>(
-    Array(1).fill(false)
-  ); // Added for vegan cheese switch
 
   const updateQuantity = (newQuantity: number) => {
     const validQuantity = Math.max(1, newQuantity);
@@ -72,12 +66,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
       }
       return prev.slice(0, validQuantity);
     });
-    setCreamSauceChoices((prev) =>
-      Array(validQuantity).fill(true)
-    ); // Update cream sauce switch array
-    setVeganCheeseChoices((prev) =>
-      Array(validQuantity).fill(false)
-    ); // Update vegan cheese switch array
   };
 
   const updateSauce = (index: number, sauceId: string) => {
@@ -90,22 +78,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
 
   const toggleParmesan = (index: number) => {
     setParmesanChoices((prev) => {
-      const newChoices = [...prev];
-      newChoices[index] = !newChoices[index];
-      return newChoices;
-    });
-  };
-
-  const toggleCreamSauce = (index: number) => {
-    setCreamSauceChoices((prev) => {
-      const newChoices = [...prev];
-      newChoices[index] = !newChoices[index];
-      return newChoices;
-    });
-  };
-
-  const toggleVeganCheese = (index: number) => {
-    setVeganCheeseChoices((prev) => {
       const newChoices = [...prev];
       newChoices[index] = !newChoices[index];
       return newChoices;
@@ -134,8 +106,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
             layout: "full",
             sections: [[]],
           },
-          isCreamSauce: creamSauceChoices[index], // Use cream sauce switch state
-          isVeganCheese: veganCheeseChoices[index], // Use vegan cheese switch state
           sauceId,
           hasParmesan: parmesanChoices[index],
         },
@@ -145,8 +115,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
     setQuantity(1);
     setSauceChoices(["cream"]);
     setParmesanChoices([false]);
-    setCreamSauceChoices(Array(1).fill(true)); // Reset cream sauce switch
-    setVeganCheeseChoices(Array(1).fill(false)); // Reset vegan cheese switch
   };
 
   return (
@@ -230,24 +198,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`cream-sauce-${index}`}>שמנת</Label>
-                        <Switch
-                          id={`cream-sauce-${index}`}
-                          checked={creamSauceChoices[index]}
-                          onCheckedChange={() => toggleCreamSauce(index)}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`vegan-cheese-${index}`}>גבינה טבעונית</Label>
-                        <Switch
-                          id={`vegan-cheese-${index}`}
-                          checked={veganCheeseChoices[index]}
-                          onCheckedChange={() => toggleVeganCheese(index)}
-                        />
-                      </div>
-
                       <div className="flex items-center justify-between flex-row-reverse">
                         <Label htmlFor={`parmesan-${index}`}>אקסטרא פרמז'ן (+ ₪3)</Label>
                         <Switch
