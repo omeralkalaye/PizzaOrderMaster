@@ -15,6 +15,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PizzaCard } from "@/components/pizza-card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CartItem } from "@/types/cart";
+import { UpsellDrinks } from "@/components/upsell-drinks";
 
 const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
@@ -42,6 +43,7 @@ export default function Cart() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
+  const [showDrinksUpsell, setShowDrinksUpsell] = useState(false);
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -55,6 +57,10 @@ export default function Cart() {
 
   const deliveryType = form.watch("deliveryType");
 
+  const handleProceedToPayment = () => {
+    setLocation("/payment");
+  };
+
   const onSubmit = (data: OrderFormData) => {
     if (items.length === 0) {
       toast({
@@ -65,22 +71,8 @@ export default function Cart() {
       return;
     }
 
-    const orderData = {
-      ...data,
-      items: items.map(item => ({
-        pizzaId: item.pizzaId,
-        quantity: item.quantity,
-        size: item.size,
-        toppingLayout: item.toppingLayout,
-        isCreamSauce: item.isCreamSauce,
-        isVeganCheese: item.isVeganCheese,
-      })),
-      status: "pending",
-      total: calculateTotal(items),
-    };
-
-    // שמירת פרטי ההזמנה ב-history state ומעבר לעמוד התשלום
-    setLocation("/payment");
+    // מציג את הצעת השתייה לפני המעבר לתשלום
+    setShowDrinksUpsell(true);
   };
 
   const handleUpdateItem = (updatedItem: CartItem) => {
@@ -102,165 +94,113 @@ export default function Cart() {
           <Button onClick={() => setLocation("/menu")}>עבור לתפריט</Button>
         </div>
       ) : (
-        <div className="grid gap-8 md:grid-cols-2">
-          <div>
-            <div className="space-y-4">
-              {items.map((item) => {
-                const toppingsCount = item.toppingLayout.sections.flat().length;
-                const hasToppings = toppingsCount > 0;
-                const hasSpecialSauce = item.isCreamSauce;
-                const hasVeganCheese = item.isVeganCheese;
+        <>
+          <div className="grid gap-8 md:grid-cols-2">
+            <div>
+              <div className="space-y-4">
+                {items.map((item) => {
+                  const toppingsCount = item.toppingLayout.sections.flat().length;
+                  const hasToppings = toppingsCount > 0;
+                  const hasSpecialSauce = item.isCreamSauce;
+                  const hasVeganCheese = item.isVeganCheese;
 
-                return (
-                  <div
-                    key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`}
-                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-accent/5"
-                    onClick={() => setEditingItem(item)}
-                  >
-                    <div>
-                      <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
-                      {hasSpecialSauce && (
-                        <p className="text-sm text-muted-foreground">רוטב שמנת</p>
-                      )}
-                      {hasVeganCheese && (
-                        <p className="text-sm text-muted-foreground">גבינה טבעונית</p>
-                      )}
-                      {hasToppings && (
+                  return (
+                    <div
+                      key={`${item.pizzaId}-${item.size}-${JSON.stringify(item.toppingLayout)}`}
+                      className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-accent/5"
+                      onClick={() => setEditingItem(item)}
+                    >
+                      <div>
+                        <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
+                        {hasSpecialSauce && (
+                          <p className="text-sm text-muted-foreground">רוטב שמנת</p>
+                        )}
+                        {hasVeganCheese && (
+                          <p className="text-sm text-muted-foreground">גבינה טבעונית</p>
+                        )}
+                        {hasToppings && (
+                          <p className="text-sm text-muted-foreground">
+                            {toppingsCount} תוספות
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground">
-                          {toppingsCount} תוספות
+                          ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
                         </p>
-                      )}
-                      <p className="text-sm text-muted-foreground">
-                        ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
-                      </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch({
+                              type: "UPDATE_QUANTITY",
+                              payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
+                            });
+                          }}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-8 text-center">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch({
+                              type: "UPDATE_QUANTITY",
+                              payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
+                            });
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch({
-                            type: "UPDATE_QUANTITY",
-                            payload: { pizzaId: item.pizzaId, quantity: Math.max(1, item.quantity - 1) }
-                          });
-                        }}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch({
-                            type: "UPDATE_QUANTITY",
-                            payload: { pizzaId: item.pizzaId, quantity: item.quantity + 1 }
-                          });
-                        }}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch({ type: "REMOVE_ITEM", payload: item.pizzaId });
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            {editingItem && (
-              <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
-                  <PizzaCard
-                    pizza={editingItem.pizza}
-                    defaultSize={editingItem.size}
-                    existingItem={editingItem}
-                    onUpdate={handleUpdateItem}
-                  />
-                </DialogContent>
-              </Dialog>
-            )}
+              {editingItem && (
+                <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto my-8">
+                    <PizzaCard
+                      pizza={editingItem.pizza}
+                      defaultSize={editingItem.size}
+                      existingItem={editingItem}
+                      onUpdate={handleUpdateItem}
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
 
-            <div className="mt-4 p-4 border rounded-lg">
-              <div className="flex justify-between text-lg font-bold">
-                <span>₪{(calculateTotal(items) / 100).toFixed(2)}</span>
-                <span>:סה"כ לתשלום</span>
+              <div className="mt-4 p-4 border rounded-lg">
+                <div className="flex justify-between text-lg font-bold">
+                  <span>₪{(calculateTotal(items) / 100).toFixed(2)}</span>
+                  <span>:סה"כ לתשלום</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="customerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>שם מלא</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>טלפון</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="tel" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="deliveryType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>אופן קבלת ההזמנה</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          className="flex flex-col gap-4"
-                        >
-                          <div className="flex items-center justify-end space-x-reverse space-x-2">
-                            <label htmlFor="delivery">משלוח</label>
-                            <RadioGroupItem value="delivery" id="delivery" />
-                          </div>
-                          <div className="flex items-center justify-end space-x-reverse space-x-2">
-                            <label htmlFor="pickup">איסוף עצמי</label>
-                            <RadioGroupItem value="pickup" id="pickup" />
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {deliveryType === "delivery" && (
+            <div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="address"
+                    name="customerName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>כתובת למשלוח</FormLabel>
+                        <FormLabel>שם מלא</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -268,14 +208,75 @@ export default function Cart() {
                       </FormItem>
                     )}
                   />
-                )}
-                <Button type="submit" className="w-full">
-                  מעבר לתשלום
-                </Button>
-              </form>
-            </Form>
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>טלפון</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="tel" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="deliveryType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>אופן קבלת ההזמנה</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="flex flex-col gap-4"
+                          >
+                            <div className="flex items-center justify-end space-x-reverse space-x-2">
+                              <label htmlFor="delivery">משלוח</label>
+                              <RadioGroupItem value="delivery" id="delivery" />
+                            </div>
+                            <div className="flex items-center justify-end space-x-reverse space-x-2">
+                              <label htmlFor="pickup">איסוף עצמי</label>
+                              <RadioGroupItem value="pickup" id="pickup" />
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {deliveryType === "delivery" && (
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>כתובת למשלוח</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  <Button type="submit" className="w-full">
+                    מעבר לתשלום
+                  </Button>
+                </form>
+              </Form>
+            </div>
           </div>
-        </div>
+
+          {/* הצעת שתייה */}
+          <UpsellDrinks
+            isOpen={showDrinksUpsell}
+            onClose={() => setShowDrinksUpsell(false)}
+            onProceed={handleProceedToPayment}
+          />
+        </>
       )}
     </div>
   );
