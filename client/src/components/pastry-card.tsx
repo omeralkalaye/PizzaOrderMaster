@@ -22,10 +22,9 @@ import { Switch } from "@/components/ui/switch";
 
 interface PastryCardProps {
   item: MenuItem;
-  defaultSize?: "S" | "M" | "L" | "XL";
 }
 
-export function PastryCard({ item, defaultSize = "M" }: PastryCardProps) {
+export function PastryCard({ item }: PastryCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isSpicy, setIsSpicy] = useState(false);
@@ -50,7 +49,7 @@ export function PastryCard({ item, defaultSize = "M" }: PastryCardProps) {
       payload: {
         pizzaId: item.id,
         pizza: item,
-        size: defaultSize,
+        size: "M",
         quantity,
         toppingLayout: {
           layout: "full",
