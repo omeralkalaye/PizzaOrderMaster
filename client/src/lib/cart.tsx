@@ -26,32 +26,40 @@ const CartContext = createContext<{
   dispatch: React.Dispatch<CartAction>;
 } | null>(null);
 
+function areItemsEqual(item1: CartItem, item2: CartItem): boolean {
+  return (
+    item1.pizzaId === item2.pizzaId &&
+    item1.size === item2.size &&
+    item1.isCreamSauce === item2.isCreamSauce &&
+    item1.isVeganCheese === item2.isVeganCheese &&
+    item1.isGratin === item2.isGratin &&
+    item1.sauceId === item2.sauceId &&
+    item1.hasParmesan === item2.hasParmesan &&
+    item1.hasBoiledEgg === item2.hasBoiledEgg &&
+    item1.doughType === item2.doughType &&
+    JSON.stringify(item1.toppingLayout) === JSON.stringify(item2.toppingLayout)
+  );
+}
+
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
-      // Check if the same item with the same customizations exists
-      const existingIndex = state.items.findIndex(
-        item =>
-          item.pizzaId === action.payload.pizzaId &&
-          item.size === action.payload.size &&
-          item.isCreamSauce === action.payload.isCreamSauce &&
-          item.isVeganCheese === action.payload.isVeganCheese &&
-          item.isGratin === action.payload.isGratin &&
-          item.sauceId === action.payload.sauceId &&
-          item.hasParmesan === action.payload.hasParmesan &&
-          item.hasBoiledEgg === action.payload.hasBoiledEgg &&
-          JSON.stringify(item.toppingLayout) === JSON.stringify(action.payload.toppingLayout)
+      // Find existing identical item
+      const existingItemIndex = state.items.findIndex(item => 
+        areItemsEqual(item, action.payload)
       );
 
-      if (existingIndex >= 0) {
+      if (existingItemIndex >= 0) {
+        // If item exists, update its quantity
         const newItems = [...state.items];
-        newItems[existingIndex] = {
-          ...newItems[existingIndex],
-          quantity: newItems[existingIndex].quantity + action.payload.quantity
+        newItems[existingItemIndex] = {
+          ...newItems[existingItemIndex],
+          quantity: newItems[existingItemIndex].quantity + action.payload.quantity
         };
         return { ...state, items: newItems };
       }
 
+      // If no identical item exists, add new item
       return { ...state, items: [...state.items, action.payload] };
     }
     case "REMOVE_ITEM":
@@ -59,15 +67,17 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ...state,
         items: state.items.filter(item => item.pizzaId !== action.payload)
       };
-    case "UPDATE_QUANTITY":
+    case "UPDATE_QUANTITY": {
+      const { pizzaId, quantity } = action.payload;
       return {
         ...state,
         items: state.items.map(item =>
-          item.pizzaId === action.payload.pizzaId
-            ? { ...item, quantity: action.payload.quantity }
+          item.pizzaId === pizzaId
+            ? { ...item, quantity }
             : item
         )
       };
+    }
     case "CLEAR":
       return { items: [] };
     default:
