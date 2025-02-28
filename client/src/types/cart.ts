@@ -12,4 +12,10 @@ export interface CartItem {
   doughType: DoughType;
   isCreamSauce?: boolean;
   isVeganCheese?: boolean;
+  isGratin?: boolean; // אופציית הקרמה עבור לחם שום
+  sauceId?: string; // אופציית הרוטב עבור פסטות
+  hasParmesan?: boolean; // אופציית פרמז'ן עבור פסטות
+  hasBoiledEgg?: boolean; // אופציית ביצה קשה עבור סלט
+  isSpicy?: boolean; // אופציית חריף עבור מאפים
+  extraCheese?: boolean; // אופציית תוספת גבינה עבור מאפים
 }

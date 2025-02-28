@@ -9,6 +9,7 @@ interface CartItem extends PizzaOrderItem {
   sauceId?: string; // אופציית הרוטב עבור פסטות
   hasParmesan?: boolean; // אופציית פרמז'ן עבור פסטות
   hasBoiledEgg?: boolean; // אופציית ביצה קשה עבור סלט
+  extraCheese?: boolean; // Added for pastries
 }
 
 interface CartState {
@@ -37,6 +38,7 @@ function areItemsEqual(item1: CartItem, item2: CartItem): boolean {
     item1.hasParmesan === item2.hasParmesan &&
     item1.hasBoiledEgg === item2.hasBoiledEgg &&
     item1.doughType === item2.doughType &&
+    item1.extraCheese === item2.extraCheese && // Added for pastries
     JSON.stringify(item1.toppingLayout) === JSON.stringify(item2.toppingLayout)
   );
 }
@@ -45,7 +47,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
       // Find existing identical item
-      const existingItemIndex = state.items.findIndex(item => 
+      const existingItemIndex = state.items.findIndex(item =>
         areItemsEqual(item, action.payload)
       );
 
@@ -125,6 +127,11 @@ export function calculateTotal(items: CartItem[]): number {
     // Add boiled egg price if selected (for salad)
     if (item.hasBoiledEgg) {
       itemTotal += 300; // 3₪ for boiled egg
+    }
+
+    // Add extra cheese price if selected (for pastries)
+    if (item.extraCheese) {
+      itemTotal += 300; // 3₪ for extra cheese
     }
 
     // Add toppings price
