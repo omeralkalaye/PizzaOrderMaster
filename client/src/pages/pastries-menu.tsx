@@ -51,7 +51,7 @@ export default function PastriesMenu() {
     {
       id: 201,
       name: "מלאווח פתוח",
-      description: "מלאווח טרי ופריך עם שמן זית",
+      description: "מלאווח טרי ופריך מוגש עם רסק עגבניות גדול וביצה קשה בצד",
       price: 2500,
       imageUrl: PASTRY_IMAGES["מלאווח פתוח"],
       available: true,
@@ -64,7 +64,7 @@ export default function PastriesMenu() {
     {
       id: 202,
       name: "מלאווח משובח",
-      description: "מלאווח במילוי גבינות משובחות",
+      description: "מלאווח מגולגל ממולא ברסק עגבניות וביצה קשה",
       price: 3000,
       imageUrl: PASTRY_IMAGES["מלאווח משובח"],
       available: true,
@@ -77,8 +77,8 @@ export default function PastriesMenu() {
     {
       id: 203,
       name: "מלאווח יווני",
-      description: "מלאווח במילוי גבינה פטה וזיתים",
-      price: 3000,
+      description: "מלאווח מגולגל עם רסק, ביצה, זיתים שחורים, בצל, גבינה בולגרית וזעתר",
+      price: 3500,
       imageUrl: PASTRY_IMAGES["מלאווח יווני"],
       available: true,
       categoryId: 5,
@@ -90,8 +90,8 @@ export default function PastriesMenu() {
     {
       id: 204,
       name: "מלאווח מעורב",
-      description: "מלאווח במילוי גבינות מעורבות",
-      price: 3000,
+      description: "מלאווח מגולגל עם רסק, ביצה, גבינה צהובה וגבינה בולגרית",
+      price: 3500,
       imageUrl: PASTRY_IMAGES["מלאווח מעורב"],
       available: true,
       categoryId: 5,
@@ -103,8 +103,8 @@ export default function PastriesMenu() {
     {
       id: 205,
       name: "מלאווח טוניסאי",
-      description: "מלאווח חריף בסגנון טוניסאי",
-      price: 3000,
+      description: "מלאווח מגולגל עם רסק, ביצה, זיתים ירוקים וטונה",
+      price: 3500,
       imageUrl: PASTRY_IMAGES["מלאווח טוניסאי"],
       available: true,
       categoryId: 5,
@@ -116,8 +116,8 @@ export default function PastriesMenu() {
     {
       id: 206,
       name: "מלאווח הבית",
-      description: "מלאווח מיוחד של השף",
-      price: 3500,
+      description: "מלאווח מגולגל עם רסק, ביצה, גבינה בולגרית, טונה ופטריות",
+      price: 3800,
       imageUrl: PASTRY_IMAGES["מלאווח הבית"],
       available: true,
       categoryId: 5,
@@ -129,7 +129,7 @@ export default function PastriesMenu() {
     {
       id: 207,
       name: "ג'חנון",
-      description: "ג'חנון תימני מסורתי",
+      description: "ג'חנון תימני מסורתי מוגש עם רסק עגבניות גדול וביצה קשה בצד",
       price: 2500,
       imageUrl: PASTRY_IMAGES["ג'חנון"],
       available: true,
