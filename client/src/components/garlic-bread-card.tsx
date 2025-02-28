@@ -73,6 +73,7 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
             layout: "full",
             sections: [[]]
           },
+          doughType: "thick",
           isCreamSauce: false,
           isVeganCheese: false,
           isGratin,
@@ -115,6 +116,7 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
             </DialogHeader>
 
             <div className="space-y-6">
+              {/* כמות */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Button
@@ -139,12 +141,15 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
               <div className="space-y-4">
                 <Label className="block text-right mb-2">בחירת הקרמה:</Label>
                 {gratinChoices.map((isGratin, index) => (
-                  <div key={index} className="flex items-center justify-between border p-3 rounded-lg flex-row-reverse">
-                    <Label>לחם שום {index + 1} - הקרמה (+ ₪3)</Label>
-                    <Switch
-                      checked={isGratin}
-                      onCheckedChange={() => toggleGratin(index)}
-                    />
+                  <div key={index} className="space-y-4 border p-4 rounded-lg">
+                    <div className="flex items-center justify-between flex-row-reverse">
+                      <Label htmlFor={`gratin-${index}`}>לחם שום {index + 1} - הקרמה (+ ₪3)</Label>
+                      <Switch
+                        id={`gratin-${index}`}
+                        checked={isGratin}
+                        onCheckedChange={() => toggleGratin(index)}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
