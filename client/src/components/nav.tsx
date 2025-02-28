@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { ShoppingCart, Menu, ArrowRight } from "lucide-react";
+import { ShoppingCart, Menu, ArrowRight, Home } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -46,6 +46,16 @@ export function Nav() {
                 <a className="flex-shrink-0 flex items-center transition-transform hover:scale-105">
                   <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-14 w-auto" />
                 </a>
+              </Link>
+              {/* כפתור בית */}
+              <Link href="/">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="ml-4 bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                >
+                  <Home className="h-5 w-5" />
+                </Button>
               </Link>
               {/* כפתור חזרה */}
               {location !== "/" && (
