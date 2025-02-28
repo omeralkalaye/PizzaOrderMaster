@@ -3,6 +3,7 @@ import { Category, MenuItem } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
+import { BakedPotatoCard } from "@/components/baked-potato-card";
 
 type MenuData = {
   categories: Category[];
@@ -11,12 +12,13 @@ type MenuData = {
 
 const CATEGORY_IMAGES = {
   "פיצות": "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-  "לחם שום": "https://images.unsplash.com/photo-1573140401552-3fab0b24306f", // Simple garlic bread image
+  "לחם שום": "https://images.unsplash.com/photo-1573140401552-3fab0b24306f",
   "פסטות": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
   "רביולי": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a",
   "תפוח אדמה מוקרם": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4",
   "סלטים": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
   "משקאות": "https://images.unsplash.com/photo-1544145945-f90425340c7e",
+  "תוספות חמות": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4" // Added this line
 };
 
 const CATEGORY_DESCRIPTIONS = {
@@ -80,6 +82,11 @@ export default function Menu() {
 
             const displayName = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
             const imageKey = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
+
+            // אם זה תפוח אדמה מוקרם, נציג את הכרטיסייה עם אפשרויות הבחירה
+            if (category.name === "תוספות חמות") {
+              return <BakedPotatoCard key={category.id} item={items[0]} />;
+            }
 
             return (
               <Card 
