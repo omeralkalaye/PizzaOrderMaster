@@ -11,20 +11,20 @@ type MenuData = {
 
 const CATEGORY_IMAGES = {
   "פיצות": "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-  "לחם שום": "https://images.unsplash.com/photo-1591985666643-1ecc67616216",
+  "לחם שום": "https://images.unsplash.com/photo-1573140401552-3fab0b24306f", // Simple garlic bread image
   "פסטות": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
   "רביולי": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a",
-  "תוספות חמות": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4", // תפוחי אדמה מוקרמים
+  "תפוח אדמה מוקרם": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4",
   "סלטים": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
   "משקאות": "https://images.unsplash.com/photo-1544145945-f90425340c7e",
 };
 
 const CATEGORY_DESCRIPTIONS = {
   "פיצות": "מגוון פיצות טריות בכל הגדלים",
-  "לחם שום": "לחם שום טרי בתוספת גבינה",
+  "לחם שום": "לחם שום בגדלים שונים",
   "פסטות": "פסטות באיכות מעולה",
   "רביולי": "רביולי באיכות מעולה במגוון מליות",
-  "תוספות חמות": "תפוח אדמה מוקרם",
+  "תפוח אדמה מוקרם": "תפוח אדמה מוקרם ברוטב שמנת",
   "סלטים": "סלטים טריים ומרעננים",
   "משקאות": "מבחר משקאות קרים",
 };
@@ -78,6 +78,9 @@ export default function Menu() {
             const items = itemsByCategory[category.id] || [];
             if (items.length === 0) return null;
 
+            const displayName = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
+            const imageKey = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
+
             return (
               <Card 
                 key={category.id} 
@@ -92,17 +95,17 @@ export default function Menu() {
               >
                 <div className="aspect-video relative">
                   <img
-                    src={CATEGORY_IMAGES[category.name as keyof typeof CATEGORY_IMAGES] || ""}
-                    alt={category.name}
+                    src={CATEGORY_IMAGES[imageKey as keyof typeof CATEGORY_IMAGES] || ""}
+                    alt={displayName}
                     className="object-cover w-full h-full"
                   />
                 </div>
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h2 className="text-2xl font-semibold mb-2">{category.name}</h2>
+                      <h2 className="text-2xl font-semibold mb-2">{displayName}</h2>
                       <p className="text-muted-foreground">
-                        {CATEGORY_DESCRIPTIONS[category.name as keyof typeof CATEGORY_DESCRIPTIONS] || 
+                        {CATEGORY_DESCRIPTIONS[imageKey as keyof typeof CATEGORY_DESCRIPTIONS] || 
                           category.description || 
                           `${items.length} פריטים`}
                       </p>
