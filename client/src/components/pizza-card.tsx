@@ -292,38 +292,38 @@ export function PizzaCard({
 
                 <div className="space-y-4">
                   {/* בצק דק */}
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
+                  <div className="flex items-center justify-between">
                     <Switch
                       id={`thin-dough-${currentPizzaIndex}`}
                       checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
                       onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
                     />
+                    <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
                   </div>
 
                   {/* רוטב שמנת */}
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <Label htmlFor={`cream-sauce-${currentPizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
+                  <div className="flex items-center justify-between">
                     <Switch
                       id={`cream-sauce-${currentPizzaIndex}`}
                       checked={selectedPizzas[currentPizzaIndex].isCreamSauce}
                       onCheckedChange={(checked) => updatePizzaSauce(currentPizzaIndex, checked)}
                     />
+                    <Label htmlFor={`cream-sauce-${currentPizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                   </div>
 
                   {/* גבינה טבעונית */}
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <Label htmlFor={`vegan-cheese-${currentPizzaIndex}`}>גבינה טבעונית</Label>
+                  <div className="flex items-center justify-between">
                     <Switch
                       id={`vegan-cheese-${currentPizzaIndex}`}
                       checked={selectedPizzas[currentPizzaIndex].isVeganCheese}
                       onCheckedChange={(checked) => updatePizzaCheese(currentPizzaIndex, checked)}
                     />
+                    <Label htmlFor={`vegan-cheese-${currentPizzaIndex}`}>גבינה טבעונית</Label>
                   </div>
                 </div>
 
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
-                  <TabsList className="w-full flex-row-reverse">
+                  <TabsList className="w-full"> {/* Removed flex-row-reverse */}
                     {selectedPizzas.map((_, index) => (
                       <TabsTrigger key={index} value={index.toString()}>
                         מגש {index + 1}
@@ -370,7 +370,7 @@ export function PizzaCard({
                       </div>
 
                       <Tabs defaultValue="0" className="w-full">
-                        <TabsList className="w-full flex-row-reverse">
+                        <TabsList className="w-full"> {/*Removed flex-row-reverse*/}
                           {Array.from({ length: sections }, (_, i) => (
                             <TabsTrigger key={i} value={i.toString()}>
                               {pizzaConfig.layout === "full" ? "תוספות" :

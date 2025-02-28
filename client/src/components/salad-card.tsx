@@ -191,7 +191,7 @@ export function SaladCard({ item }: SaladCardProps) {
             </div>
 
             <Tabs value={currentSalad.toString()} onValueChange={(value) => setCurrentSalad(parseInt(value))}>
-              <TabsList className="w-full flex-row-reverse">
+              <TabsList className="w-full">
                 {selectedIngredients.map((_, index) => (
                   <TabsTrigger key={index} value={index.toString()}>
                     מנה {index + 1}
@@ -203,13 +203,13 @@ export function SaladCard({ item }: SaladCardProps) {
                 <TabsContent key={saladIndex} value={saladIndex.toString()}>
                   <div className="space-y-4">
                     <div className="space-y-4 border p-4 rounded-lg">
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`boiled-egg-${saladIndex}`}>ביצה קשה (+ ₪3)</Label>
+                      <div className="flex items-center justify-between">
                         <Switch
                           id={`boiled-egg-${saladIndex}`}
                           checked={hasBoiledEgg[saladIndex]}
                           onCheckedChange={() => toggleBoiledEgg(saladIndex)}
                         />
+                        <Label htmlFor={`boiled-egg-${saladIndex}`}>ביצה קשה (+ ₪3)</Label>
                       </div>
                     </div>
 

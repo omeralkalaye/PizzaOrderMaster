@@ -231,33 +231,33 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
 
                     <div className="space-y-4">
                       {/* רוטב שמנת */}
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`cream-sauce-${index}`}>שמנת</Label>
+                      <div className="flex items-center justify-between">
                         <Switch
                           id={`cream-sauce-${index}`}
                           checked={creamSauceChoices[index]}
                           onCheckedChange={() => toggleCreamSauce(index)}
                         />
+                        <Label htmlFor={`cream-sauce-${index}`}>שמנת</Label>
                       </div>
 
                       {/* גבינה טבעונית */}
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`vegan-cheese-${index}`}>גבינה טבעונית</Label>
+                      <div className="flex items-center justify-between">
                         <Switch
                           id={`vegan-cheese-${index}`}
                           checked={veganCheeseChoices[index]}
                           onCheckedChange={() => toggleVeganCheese(index)}
                         />
+                        <Label htmlFor={`vegan-cheese-${index}`}>גבינה טבעונית</Label>
                       </div>
 
                       {/* אקסטרא פרמז'ן */}
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`parmesan-${index}`}>אקסטרא פרמז'ן (+ ₪3)</Label>
+                      <div className="flex items-center justify-between">
                         <Switch
                           id={`parmesan-${index}`}
                           checked={parmesanChoices[index]}
                           onCheckedChange={() => toggleParmesan(index)}
                         />
+                        <Label htmlFor={`parmesan-${index}`}>אקסטרא פרמז'ן (+ ₪3)</Label>
                       </div>
                     </div>
                   </div>
