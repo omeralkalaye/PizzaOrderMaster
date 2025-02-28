@@ -181,24 +181,22 @@ export function PizzaCard({
         isVeganCheese: selectedPizzas[0].isVeganCheese,
       });
     } else {
-      // Add all pizzas as a single item with combined quantity
-      selectedPizzas.forEach((pizzaConfig) => {
-        dispatch({
-          type: "ADD_ITEM",
-          payload: {
-            pizzaId: pizza.id,
-            pizza,
-            size,
-            quantity: quantity,
-            toppingLayout: {
-              layout: pizzaConfig.layout,
-              sections: pizzaConfig.sections
-            },
-            doughType: pizzaConfig.doughType,
-            isCreamSauce: pizzaConfig.isCreamSauce,
-            isVeganCheese: pizzaConfig.isVeganCheese,
+      // Add single item with combined quantity
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          pizzaId: pizza.id,
+          pizza,
+          size,
+          quantity: quantity, // This is the total quantity selected
+          toppingLayout: {
+            layout: selectedPizzas[0].layout,
+            sections: selectedPizzas[0].sections
           },
-        });
+          doughType: selectedPizzas[0].doughType,
+          isCreamSauce: selectedPizzas[0].isCreamSauce,
+          isVeganCheese: selectedPizzas[0].isVeganCheese,
+        },
       });
     }
     setIsDialogOpen(false);
