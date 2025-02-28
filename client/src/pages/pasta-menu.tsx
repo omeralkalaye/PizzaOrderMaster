@@ -52,6 +52,11 @@ export default function PastaMenu() {
       price: 4500,
       imageUrl: PASTA_IMAGES["פסטה פנה"],
       available: true,
+      categoryId: 3,
+      allowsToppings: false,
+      allowsSizes: false,
+      allowsSauces: false,
+      isCustomizable: false,
     },
     {
       id: 102,
@@ -60,6 +65,11 @@ export default function PastaMenu() {
       price: 4500,
       imageUrl: PASTA_IMAGES["פסטה פטוצ'יני"],
       available: true,
+      categoryId: 3,
+      allowsToppings: false,
+      allowsSizes: false,
+      allowsSauces: false,
+      isCustomizable: false,
     },
     {
       id: 103,
@@ -68,6 +78,11 @@ export default function PastaMenu() {
       price: 5000,
       imageUrl: PASTA_IMAGES["רביולי גבינה"],
       available: true,
+      categoryId: 4,
+      allowsToppings: false,
+      allowsSizes: false,
+      allowsSauces: false,
+      isCustomizable: false,
     },
     {
       id: 104,
@@ -76,6 +91,11 @@ export default function PastaMenu() {
       price: 5000,
       imageUrl: PASTA_IMAGES["רביולי בטטה"],
       available: true,
+      categoryId: 4,
+      allowsToppings: false,
+      allowsSizes: false,
+      allowsSauces: false,
+      isCustomizable: false,
     },
   ];
 

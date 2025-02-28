@@ -21,9 +21,10 @@ import { Label } from "@/components/ui/label";
 
 interface PastaCardProps {
   item: MenuItem;
+  defaultSize?: "S" | "M" | "L" | "XL";
 }
 
-export function PastaCard({ item }: PastaCardProps) {
+export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -42,6 +43,7 @@ export function PastaCard({ item }: PastaCardProps) {
       payload: {
         pizzaId: item.id,
         pizza: item,
+        size: defaultSize,
         quantity: quantity,
         toppingLayout: {
           layout: "full",
