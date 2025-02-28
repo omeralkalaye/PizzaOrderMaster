@@ -1,3 +1,5 @@
+const POTATO_IMAGE = "https://images.unsplash.com/photo-1585148859494-dd5959e5c6e6";
+
 import { MenuItem } from "@shared/schema";
 import {
   Card,
@@ -113,7 +115,7 @@ export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
         <CardContent>
           <div className="aspect-video relative rounded-md overflow-hidden mb-4">
             <img
-              src={item.imageUrl || ""}
+              src={POTATO_IMAGE}
               alt={item.name}
               className="object-cover w-full h-full"
             />

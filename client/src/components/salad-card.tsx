@@ -19,6 +19,22 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
+// Add salad ingredients images at the top of the file
+const SALAD_IMAGES = {
+  "חסה": "https://images.unsplash.com/photo-1622205313162-be1d5712a43b",
+  "עגבניות שרי": "https://images.unsplash.com/photo-1562699459-b5745a8bc6ad",
+  "מלפפון": "https://images.unsplash.com/photo-1604977042946-1eecc30f269e",
+  "פלפל": "https://images.unsplash.com/photo-1563246976-4f2b3cf7d25b",
+  "בצל סגול": "https://images.unsplash.com/photo-1580201092675-a0a6a6cafbb1",
+  "גזר": "https://images.unsplash.com/photo-1582515073490-39981397c445",
+  "תירס": "https://images.unsplash.com/photo-1551754655-cd27e38d2076",
+  "זיתים שחורים": "https://images.unsplash.com/photo-1632934345981-22b1a93711f5",
+  "טונה": "https://images.unsplash.com/photo-1597733153203-a54d0dbc0203",
+  "גבינה בולגרית": "https://images.unsplash.com/photo-1559561853-08451507cbe7",
+};
+
+const SALAD_IMAGE = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd";
+
 // מרכיבים אפשריים לסלט
 const SALAD_INGREDIENTS = [
   { id: 1, name: "חסה" },
@@ -122,7 +138,7 @@ export function SaladCard({ item }: SaladCardProps) {
 
   return (
     <>
-      <Card 
+      <Card
         className="w-full cursor-pointer hover:bg-accent/5 transition-colors"
         onClick={() => setIsDialogOpen(true)}
       >
@@ -137,7 +153,7 @@ export function SaladCard({ item }: SaladCardProps) {
         <CardContent>
           <div className="aspect-video relative rounded-md overflow-hidden mb-4">
             <img
-              src={item.imageUrl || ""}
+              src={SALAD_IMAGES[item.name] || SALAD_IMAGE}
               alt={item.name}
               className="object-cover w-full h-full"
             />
