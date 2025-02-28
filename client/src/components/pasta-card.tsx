@@ -18,6 +18,23 @@ import {
 } from "@/components/ui/dialog";
 import { Minus, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const SAUCE_OPTIONS = [
+  { id: "cream", name: "שמנת", price: 0 },
+  { id: "mushroom_cream", name: "שמנת פטריות", price: 300 },
+  { id: "rosa", name: "רוזה", price: 0 },
+  { id: "tomato", name: "עגבניות", price: 0 },
+  { id: "spicy_tomato", name: "עגבניות חריף", price: 0 },
+  { id: "pesto_cream", name: "שמנת פסטו", price: 300 },
+  { id: "pesto", name: "פסטו", price: 300 },
+];
 
 interface PastaCardProps {
   item: MenuItem;
@@ -27,34 +44,60 @@ interface PastaCardProps {
 export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [sauceChoices, setSauceChoices] = useState<string[]>(["cream"]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const updateQuantity = (newQuantity: number) => {
-    setQuantity(Math.max(1, newQuantity));
+    const validQuantity = Math.max(1, newQuantity);
+    setQuantity(validQuantity);
+    setSauceChoices(prev => {
+      if (validQuantity > prev.length) {
+        return [...prev, ...Array(validQuantity - prev.length).fill("cream")];
+      }
+      return prev.slice(0, validQuantity);
+    });
+  };
+
+  const updateSauce = (index: number, sauceId: string) => {
+    setSauceChoices(prev => {
+      const newChoices = [...prev];
+      newChoices[index] = sauceId;
+      return newChoices;
+    });
   };
 
   const calculateTotalPrice = () => {
-    return item.price * quantity;
+    const basePrice = item.price;
+    const saucePrice = sauceChoices.reduce((total, sauceId) => {
+      const sauce = SAUCE_OPTIONS.find(s => s.id === sauceId);
+      return total + (sauce?.price || 0);
+    }, 0);
+    return basePrice * quantity + saucePrice;
   };
 
   const handleAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        pizzaId: item.id,
-        pizza: item,
-        size: defaultSize,
-        quantity: quantity,
-        toppingLayout: {
-          layout: "full",
-          sections: [[]]
+    // Add each pasta as a separate item with its own sauce choice
+    sauceChoices.forEach((sauceId) => {
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          pizzaId: item.id,
+          pizza: item,
+          size: defaultSize,
+          quantity: 1,
+          toppingLayout: {
+            layout: "full",
+            sections: [[]]
+          },
+          isCreamSauce: false,
+          isVeganCheese: false,
+          sauceId,
         },
-        isCreamSauce: false,
-        isVeganCheese: false,
-      },
+      });
     });
     setIsDialogOpen(false);
     setQuantity(1);
+    setSauceChoices(["cream"]);
   };
 
   return (
@@ -107,6 +150,34 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
                   </Button>
                 </div>
                 <Label>כמות</Label>
+              </div>
+
+              <div className="space-y-4">
+                <Label className="block text-right mb-2">בחירת רוטב:</Label>
+                {sauceChoices.map((sauceId, index) => {
+                  const selectedSauce = SAUCE_OPTIONS.find(s => s.id === sauceId);
+                  return (
+                    <div key={index} className="flex items-center justify-between border p-3 rounded-lg">
+                      <Select
+                        value={sauceId}
+                        onValueChange={(value) => updateSauce(index, value)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SAUCE_OPTIONS.map((sauce) => (
+                            <SelectItem key={sauce.id} value={sauce.id}>
+                              {sauce.name}
+                              {sauce.price > 0 && ` (+ ₪${(sauce.price / 100).toFixed(2)})`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Label>מנה {index + 1}</Label>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="mt-4 p-4 border rounded-lg">

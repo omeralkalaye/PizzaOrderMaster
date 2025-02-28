@@ -6,6 +6,7 @@ interface CartItem extends PizzaOrderItem {
   isCreamSauce?: boolean;
   isVeganCheese?: boolean;
   isGratin?: boolean; // אופציית הקרמה עבור לחם שום
+  sauceId?: string; // אופציית הרוטב עבור פסטות
 }
 
 interface CartState {
@@ -26,13 +27,15 @@ const CartContext = createContext<{
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
-      // Check if the same pizza with the same size, sauce, cheese and toppings layout exists
+      // Check if the same item with the same customizations exists
       const existingIndex = state.items.findIndex(
         item =>
           item.pizzaId === action.payload.pizzaId &&
           item.size === action.payload.size &&
           item.isCreamSauce === action.payload.isCreamSauce &&
           item.isVeganCheese === action.payload.isVeganCheese &&
+          item.isGratin === action.payload.isGratin &&
+          item.sauceId === action.payload.sauceId &&
           JSON.stringify(item.toppingLayout) === JSON.stringify(action.payload.toppingLayout)
       );
 
@@ -99,6 +102,16 @@ export function calculateTotal(items: CartItem[]): number {
     // Add gratin price if selected (for garlic bread)
     if (item.isGratin) {
       itemTotal += 300; // 3₪ for gratin
+    }
+
+    // Add special sauce price for pasta
+    if (item.sauceId) {
+      const saucePrice = {
+        "mushroom_cream": 300,
+        "pesto_cream": 300,
+        "pesto": 300,
+      }[item.sauceId] || 0;
+      itemTotal += saucePrice;
     }
 
     // Add toppings price
