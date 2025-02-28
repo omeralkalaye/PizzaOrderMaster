@@ -104,16 +104,6 @@ export function calculateTotal(items: CartItem[]): number {
       itemTotal += 300; // 3₪ for gratin
     }
 
-    // Add special sauce price for pasta
-    if (item.sauceId) {
-      const saucePrice = {
-        "mushroom_cream": 300,
-        "pesto_cream": 300,
-        "pesto": 300,
-      }[item.sauceId] || 0;
-      itemTotal += saucePrice;
-    }
-
     // Add toppings price
     item.toppingLayout.sections.forEach(section => {
       section.forEach(toppingId => {

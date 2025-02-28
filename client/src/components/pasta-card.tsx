@@ -28,12 +28,12 @@ import {
 
 const SAUCE_OPTIONS = [
   { id: "cream", name: "שמנת", price: 0 },
-  { id: "mushroom_cream", name: "שמנת פטריות", price: 300 },
+  { id: "mushroom_cream", name: "שמנת פטריות", price: 0 },
   { id: "rosa", name: "רוזה", price: 0 },
   { id: "tomato", name: "עגבניות", price: 0 },
   { id: "spicy_tomato", name: "עגבניות חריף", price: 0 },
-  { id: "pesto_cream", name: "שמנת פסטו", price: 300 },
-  { id: "pesto", name: "פסטו", price: 300 },
+  { id: "pesto_cream", name: "שמנת פסטו", price: 0 },
+  { id: "pesto", name: "פסטו", price: 0 },
 ];
 
 interface PastaCardProps {
@@ -68,11 +68,7 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
 
   const calculateTotalPrice = () => {
     const basePrice = item.price;
-    const saucePrice = sauceChoices.reduce((total, sauceId) => {
-      const sauce = SAUCE_OPTIONS.find(s => s.id === sauceId);
-      return total + (sauce?.price || 0);
-    }, 0);
-    return basePrice * quantity + saucePrice;
+    return basePrice * quantity;
   };
 
   const handleAddToCart = () => {
@@ -169,7 +165,6 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
                           {SAUCE_OPTIONS.map((sauce) => (
                             <SelectItem key={sauce.id} value={sauce.id}>
                               {sauce.name}
-                              {sauce.price > 0 && ` (+ ₪${(sauce.price / 100).toFixed(2)})`}
                             </SelectItem>
                           ))}
                         </SelectContent>
