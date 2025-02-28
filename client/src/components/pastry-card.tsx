@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { useDelivery } from "@/lib/delivery-context";
 import { useState } from "react";
 import {
   Dialog,
@@ -29,6 +30,7 @@ interface PastryCardProps {
 
 export function PastryCard({ item }: PastryCardProps) {
   const { dispatch } = useCart();
+  const { deliveryType, getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(1);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [isSpicy, setIsSpicy] = useState(false);
@@ -96,7 +98,7 @@ export function PastryCard({ item }: PastryCardProps) {
   };
 
   const calculateTotalPrice = () => {
-    const basePrice = item.price * quantity;
+    const basePrice = item.price * getPriceMultiplier();
     const extraSpicyTotal = extraSpicy * EXTRA_SPICY_PRICE;
     const smallSauceTotal = smallSauce * SMALL_SAUCE_PRICE;
     const largeSauceTotal = largeSauce * LARGE_SAUCE_PRICE;
@@ -106,7 +108,7 @@ export function PastryCard({ item }: PastryCardProps) {
         return itemTotal + (topping?.price || 0);
       }, 0);
     }, 0);
-    return basePrice + extraSpicyTotal + smallSauceTotal + largeSauceTotal + toppingsTotal;
+    return basePrice * quantity + extraSpicyTotal + smallSauceTotal + largeSauceTotal + toppingsTotal;
   };
 
   const handleAddToCart = () => {
@@ -181,7 +183,8 @@ export function PastryCard({ item }: PastryCardProps) {
         <CardTitle className="flex justify-between items-center text-center">
           <span>{item.name}</span>
           <span className="text-lg">
-            ₪{(item.price / 100).toFixed(2)}
+            ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
+            {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
           </span>
         </CardTitle>
       </CardHeader>

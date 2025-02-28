@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useCart } from "@/lib/cart";
+import { useDelivery } from "@/lib/delivery-context";
 import { useState } from "react";
 import {
   Dialog,
@@ -19,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
-// Add salad ingredients images at the top of the file
+// המחירים ותמונות נשארים ללא שינוי
 const SALAD_IMAGES = {
   "חסה": "https://images.unsplash.com/photo-1622205313162-be1d5712a43b",
   "עגבניות שרי": "https://images.unsplash.com/photo-1562699459-b5745a8bc6ad",
@@ -34,8 +35,6 @@ const SALAD_IMAGES = {
 };
 
 const SALAD_IMAGE = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd";
-
-// מרכיבים אפשריים לסלט
 const SALAD_INGREDIENTS = [
   { id: 1, name: "חסה" },
   { id: 2, name: "עגבניות שרי" },
@@ -48,8 +47,7 @@ const SALAD_INGREDIENTS = [
   { id: 9, name: "טונה" },
   { id: 10, name: "גבינה בולגרית" },
 ];
-
-const BOILED_EGG_PRICE = 300; // 3₪ לביצה קשה
+const BOILED_EGG_PRICE = 300;
 
 interface SaladCardProps {
   item: MenuItem;
@@ -57,6 +55,7 @@ interface SaladCardProps {
 
 export function SaladCard({ item }: SaladCardProps) {
   const { dispatch } = useCart();
+  const { deliveryType, getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(1);
   const [selectedIngredients, setSelectedIngredients] = useState<Array<number[]>>([[]]);
   const [hasBoiledEgg, setHasBoiledEgg] = useState<boolean[]>([false]);
@@ -104,7 +103,7 @@ export function SaladCard({ item }: SaladCardProps) {
   };
 
   const calculateTotalPrice = () => {
-    const basePrice = item.price;
+    const basePrice = item.price * getPriceMultiplier();
     const boiledEggPrice = hasBoiledEgg.reduce((total, hasEgg) =>
       total + (hasEgg ? BOILED_EGG_PRICE : 0), 0);
     return basePrice * quantity + boiledEggPrice;
@@ -146,7 +145,8 @@ export function SaladCard({ item }: SaladCardProps) {
           <CardTitle className="flex justify-between items-center text-center">
             <span>{item.name}</span>
             <span className="text-lg">
-              ₪{(item.price / 100).toFixed(2)}
+              ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
+              {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
             </span>
           </CardTitle>
         </CardHeader>

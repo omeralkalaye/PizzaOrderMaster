@@ -1,5 +1,3 @@
-const POTATO_IMAGE = "https://images.unsplash.com/photo-1585148859494-dd5959e5c6e6";
-
 import { MenuItem } from "@shared/schema";
 import {
   Card,
@@ -8,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useCart } from "@/lib/cart";
+import { useDelivery } from "@/lib/delivery-context";
 import { useState } from "react";
 import {
   Dialog,
@@ -28,6 +27,7 @@ interface BakedPotatoCardProps {
 
 export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
   const { dispatch } = useCart();
+  const { deliveryType, getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(1);
   const [selectedToppings, setSelectedToppings] = useState<Array<number[]>>([[]]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -64,7 +64,7 @@ export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
   };
 
   const calculateTotalPrice = () => {
-    const basePrice = item.price;
+    const basePrice = item.price * getPriceMultiplier();
     const toppingsPrice = selectedToppings.reduce((total, potatoToppings) => {
       return total + potatoToppings.reduce((toppingTotal, toppingId) => {
         const topping = toppings?.find(t => t.id === toppingId);
@@ -89,6 +89,7 @@ export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
           },
           isCreamSauce: false,
           isVeganCheese: false,
+          doughType: "thick",
         },
       });
     });
@@ -108,14 +109,15 @@ export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
           <CardTitle className="flex justify-between items-center text-center">
             <span>{item.name}</span>
             <span className="text-lg">
-              ₪{(item.price / 100).toFixed(2)}
+              ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
+              {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="aspect-video relative rounded-md overflow-hidden mb-4">
             <img
-              src={POTATO_IMAGE}
+              src={item.imageUrl || ""}
               alt={item.name}
               className="object-cover w-full h-full"
             />
