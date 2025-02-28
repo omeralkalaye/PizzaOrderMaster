@@ -16,10 +16,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, CheckCircle2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useQuery } from "@tanstack/react-query";
+import { Topping } from "@shared/schema";
 
 interface PastryCardProps {
   item: MenuItem;
@@ -28,15 +30,20 @@ interface PastryCardProps {
 export function PastryCard({ item }: PastryCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [isSpicy, setIsSpicy] = useState(false);
   const [extraSpicy, setExtraSpicy] = useState(0); // כמות חריף נוסף בתשלום
   const [smallSauce, setSmallSauce] = useState(0); // כמות רסק קטן
   const [largeSauce, setLargeSauce] = useState(0); // כמות רסק גדול
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentItemIndex, setCurrentItemIndex] = useState(0);
 
-  // מערך של מרכיבים מוסרים לכל פריט בנפרד
+  // מערך של מרכיבים מוסרים והתוספות לכל פריט בנפרד
   const [itemsRemovedIngredients, setItemsRemovedIngredients] = useState<string[][]>([[]]);
+  const [itemsToppings, setItemsToppings] = useState<number[][]>([[]]);
+
+  const { data: toppings } = useQuery<Topping[]>({
+    queryKey: ["/api/toppings"],
+  });
 
   // מחירי תוספות
   const EXTRA_SPICY_PRICE = 200; // 2₪ לתוספת חריף
@@ -64,17 +71,25 @@ export function PastryCard({ item }: PastryCardProps) {
     }
   };
 
+  const canAddToppings = !["מלאווח פתוח", "ג'חנון"].includes(item.name);
+
   const updateQuantity = (newQuantity: number) => {
     const currentQuantity = Math.max(1, newQuantity);
     setQuantity(currentQuantity);
 
-    // עדכון מערך המרכיבים המוסרים בהתאם לכמות החדשה
+    // עדכון מערכי המרכיבים המוסרים והתוספות בהתאם לכמות החדשה
     setItemsRemovedIngredients(current => {
       if (currentQuantity > current.length) {
-        // הוספת מערכים ריקים עבור הפריטים החדשים
         return [...current, ...Array(currentQuantity - current.length).fill([])];
       } else {
-        // הסרת מערכים עודפים
+        return current.slice(0, currentQuantity);
+      }
+    });
+
+    setItemsToppings(current => {
+      if (currentQuantity > current.length) {
+        return [...current, ...Array(currentQuantity - current.length).fill([])];
+      } else {
         return current.slice(0, currentQuantity);
       }
     });
@@ -85,7 +100,13 @@ export function PastryCard({ item }: PastryCardProps) {
     const extraSpicyTotal = extraSpicy * EXTRA_SPICY_PRICE;
     const smallSauceTotal = smallSauce * SMALL_SAUCE_PRICE;
     const largeSauceTotal = largeSauce * LARGE_SAUCE_PRICE;
-    return basePrice + extraSpicyTotal + smallSauceTotal + largeSauceTotal;
+    const toppingsTotal = itemsToppings.reduce((total, itemToppings) => {
+      return total + itemToppings.reduce((itemTotal, toppingId) => {
+        const topping = toppings?.find(t => t.id === toppingId);
+        return itemTotal + (topping?.price || 0);
+      }, 0);
+    }, 0);
+    return basePrice + extraSpicyTotal + smallSauceTotal + largeSauceTotal + toppingsTotal;
   };
 
   const handleAddToCart = () => {
@@ -100,7 +121,7 @@ export function PastryCard({ item }: PastryCardProps) {
           quantity: 1, // כל פריט בנפרד
           toppingLayout: {
             layout: "full",
-            sections: [[]]
+            sections: [itemsToppings[i] || []]
           },
           doughType: "thick",
           isSpicy,
@@ -122,6 +143,7 @@ export function PastryCard({ item }: PastryCardProps) {
     setSmallSauce(0);
     setLargeSauce(0);
     setItemsRemovedIngredients([[]]);
+    setItemsToppings([[]]);
     setCurrentItemIndex(0);
   };
 
@@ -133,6 +155,21 @@ export function PastryCard({ item }: PastryCardProps) {
       newItems[currentItemIndex] = currentIngredients.includes(ingredient)
         ? currentIngredients.filter(i => i !== ingredient)
         : [...currentIngredients, ingredient];
+
+      return newItems;
+    });
+  };
+
+  const toggleTopping = (toppingId: number) => {
+    setItemsToppings(current => {
+      const newItems = [...current];
+      const currentToppings = newItems[currentItemIndex] || [];
+
+      if (currentToppings.includes(toppingId)) {
+        newItems[currentItemIndex] = currentToppings.filter(id => id !== toppingId);
+      } else if (currentToppings.length < 3) {
+        newItems[currentItemIndex] = [...currentToppings, toppingId];
+      }
 
       return newItems;
     });
@@ -169,9 +206,9 @@ export function PastryCard({ item }: PastryCardProps) {
             </DialogHeader>
 
             <div className="space-y-6">
-              {/* כמות */}
+              {/* כמות מנות */}
               <div className="flex items-center justify-between flex-row-reverse">
-                <Label>כמות</Label>
+                <Label>כמות מנות</Label>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
@@ -191,7 +228,7 @@ export function PastryCard({ item }: PastryCardProps) {
                 </div>
               </div>
 
-              {/* הסרת מרכיבים בתוך מערכת הלשוניות */}
+              {/* הסרת מרכיבים והוספת תוספות בתוך מערכת הלשוניות */}
               <div className="space-y-4">
                 <Label className="block">התאמה אישית לכל מנה:</Label>
                 <Tabs value={currentItemIndex.toString()} onValueChange={(value) => setCurrentItemIndex(parseInt(value))}>
@@ -217,13 +254,39 @@ export function PastryCard({ item }: PastryCardProps) {
                           </div>
                         ))}
                       </div>
+
+                      {/* תוספות בתשלום */}
+                      {canAddToppings && (
+                        <div className="mt-6">
+                          <Label className="block mb-2 text-right" dir="rtl">הוסף תוספות (עד 3):</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {toppings?.map(topping => {
+                              const isSelected = itemsToppings[currentItemIndex]?.includes(topping.id);
+                              const canSelect = !isSelected && (!itemsToppings[currentItemIndex] || itemsToppings[currentItemIndex].length < 3);
+
+                              return (
+                                <Button
+                                  key={topping.id}
+                                  variant={isSelected ? "secondary" : "outline"}
+                                  className="justify-end"
+                                  onClick={() => toggleTopping(topping.id)}
+                                  disabled={!isSelected && !canSelect}
+                                >
+                                  {topping.name} (₪{(topping.price / 100).toFixed(2)})
+                                  {isSelected && <CheckCircle2 className="w-4 h-4 ml-2" />}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                 </Tabs>
               </div>
 
               <div className="border-t pt-4">
-                <Label className="block mb-4 text-lg">תוספות משותפות לכל הפריטים:</Label>
+                <Label className="block mb-4 text-lg">תוספות משותפות לכל המנות:</Label>
 
                 {/* חריף */}
                 <div className="space-y-4">
