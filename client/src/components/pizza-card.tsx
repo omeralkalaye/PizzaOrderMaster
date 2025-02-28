@@ -268,25 +268,7 @@ export function PizzaCard({
               </DialogHeader>
 
               <div className="space-y-4">
-                <div className="space-y-4">
-                  <Label className="block text-right">סוג בצק:</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      variant={selectedPizzas[currentPizzaIndex].doughType === "thin" ? "secondary" : "outline"}
-                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thin")}
-                      className="justify-end"
-                    >
-                      בצק דק
-                    </Button>
-                    <Button
-                      variant={selectedPizzas[currentPizzaIndex].doughType === "thick" ? "secondary" : "outline"}
-                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thick")}
-                      className="justify-end"
-                    >
-                      בצק עבה
-                    </Button>
-                  </div>
-                </div>
+                {/* כמות מגשים */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Button
@@ -308,6 +290,26 @@ export function PizzaCard({
                   <Label>כמות מגשים</Label>
                 </div>
 
+                {/* סוג בצק */}
+                <div className="space-y-4">
+                  <Label className="block text-right">סוג בצק:</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant={selectedPizzas[currentPizzaIndex].doughType === "thin" ? "secondary" : "outline"}
+                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thin")}
+                      className="justify-end"
+                    >
+                      בצק דק
+                    </Button>
+                    <Button
+                      variant={selectedPizzas[currentPizzaIndex].doughType === "thick" ? "secondary" : "outline"}
+                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thick")}
+                      className="justify-end"
+                    >
+                      בצק עבה
+                    </Button>
+                  </div>
+                </div>
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
                   <TabsList className="w-full flex-row-reverse">
                     {selectedPizzas.map((_, index) => (
