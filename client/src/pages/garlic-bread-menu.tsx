@@ -2,9 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { GarlicBreadCard } from "@/components/garlic-bread-card";
 import { Category, MenuItem, itemSizes } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { useLocation } from "wouter";
-import { ChevronRight } from "lucide-react";
 
 type MenuData = {
   categories: Category[];
@@ -12,7 +9,6 @@ type MenuData = {
 }
 
 export default function GarlicBreadMenu() {
-  const [, setLocation] = useLocation();
   const { data, isLoading } = useQuery<MenuData>({
     queryKey: ["/api/menu"],
   });
@@ -51,18 +47,7 @@ export default function GarlicBreadMenu() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-4 mb-8">
-        <Button 
-          variant="ghost" 
-          className="flex items-center gap-2"
-          onClick={() => setLocation("/menu")}
-        >
-          <ChevronRight className="h-4 w-4" />
-          חזרה לתפריט
-        </Button>
-        <h1 className="text-3xl font-bold">תפריט לחם שום</h1>
-      </div>
-
+      <h1 className="text-3xl font-bold mb-8">תפריט לחם שום</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {Object.entries(itemSizes).map(([size, { name, priceMultiplier }]) => (
           <GarlicBreadCard
@@ -70,7 +55,8 @@ export default function GarlicBreadMenu() {
             item={{
               ...baseGarlicBread,
               name: `לחם שום ${name}`,
-              price: Math.round(baseGarlicBread.price * priceMultiplier)
+              price: Math.round(baseGarlicBread.price * priceMultiplier),
+              imageUrl: "https://images.unsplash.com/photo-1573140401552-3fab0b24306f"
             }}
             defaultSize={size as "S" | "M" | "L" | "XL"}
           />
