@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { PizzaCard } from "@/components/pizza-card";
-import { Category, MenuItem } from "@shared/schema";
+import { Category, MenuItem, itemSizes } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type MenuData = {
@@ -55,6 +55,30 @@ export default function Menu() {
           const items = itemsByCategory[category.id] || [];
           if (items.length === 0) return null;
 
+          // אם זו קטגוריית הפיצות, נציג את הפיצה הבסיסית בכל הגדלים
+          if (category.name === "פיצות" && items.length > 0) {
+            const basePizza = items[0];
+            return (
+              <div key={category.id} className="mb-12">
+                <h2 className="text-2xl font-semibold mb-6">{category.name}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {Object.entries(itemSizes).map(([size, { name, priceMultiplier }]) => (
+                    <PizzaCard
+                      key={`${basePizza.id}-${size}`}
+                      pizza={{
+                        ...basePizza,
+                        name: `פיצה ${name}`,
+                        price: Math.round(basePizza.price * priceMultiplier)
+                      }}
+                      defaultSize={size as "S" | "M" | "L" | "XL"}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          // עבור שאר הקטגוריות, נציג את הפריטים כרגיל
           return (
             <div key={category.id} className="mb-12">
               <h2 className="text-2xl font-semibold mb-6">{category.name}</h2>
