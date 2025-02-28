@@ -66,6 +66,8 @@ export default function Menu() {
                 onClick={() => {
                   if (category.name === "פיצות") {
                     setLocation("/pizza-menu");
+                  } else if (category.name === "לחם שום") {
+                    setLocation("/garlic-bread-menu");
                   }
                 }}
               >
