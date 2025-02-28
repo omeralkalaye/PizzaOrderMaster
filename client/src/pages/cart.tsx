@@ -53,13 +53,20 @@ const DRINKS = {
   ],
 };
 
+interface DrinkSelection {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  size: "small" | "large";
+}
+
 export default function Cart() {
   const { state: { items }, dispatch } = useCart();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
-  const [selectedSmallDrink, setSelectedSmallDrink] = useState<string>("");
-  const [selectedLargeDrink, setSelectedLargeDrink] = useState<string>("");
+  const [selectedDrinks, setSelectedDrinks] = useState<DrinkSelection[]>([]);
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -74,13 +81,41 @@ export default function Cart() {
   const deliveryType = form.watch("deliveryType");
 
   const calculateDrinksTotal = () => {
-    const smallDrinkPrice = selectedSmallDrink ? DRINKS.small.find(d => d.id === selectedSmallDrink)?.price || 0 : 0;
-    const largeDrinkPrice = selectedLargeDrink ? DRINKS.large.find(d => d.id === selectedLargeDrink)?.price || 0 : 0;
-    return smallDrinkPrice + largeDrinkPrice;
+    return selectedDrinks.reduce((total, drink) => total + drink.price * drink.quantity, 0);
   };
 
   const calculateFinalTotal = () => {
     return calculateTotal(items) + calculateDrinksTotal();
+  };
+
+  const handleAddDrink = (size: "small" | "large", drinkId: string) => {
+    const drinkList = DRINKS[size];
+    const selectedDrink = drinkList.find(d => d.id === drinkId);
+    if (!selectedDrink) return;
+
+    setSelectedDrinks(prev => [
+      ...prev,
+      {
+        id: drinkId,
+        name: selectedDrink.name,
+        price: selectedDrink.price,
+        quantity: 1,
+        size
+      }
+    ]);
+  };
+
+  const handleUpdateDrinkQuantity = (index: number, change: number) => {
+    setSelectedDrinks(prev => {
+      const updated = [...prev];
+      const newQuantity = Math.max(1, updated[index].quantity + change);
+      updated[index] = { ...updated[index], quantity: newQuantity };
+      return updated;
+    });
+  };
+
+  const handleRemoveDrink = (index: number) => {
+    setSelectedDrinks(prev => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = (data: OrderFormData) => {
@@ -93,64 +128,32 @@ export default function Cart() {
       return;
     }
 
-    // הוספת השתייה לעגלה אם נבחרה
-    if (selectedSmallDrink) {
-      const drink = DRINKS.small.find(d => d.id === selectedSmallDrink);
-      if (drink) {
-        dispatch({
-          type: "ADD_ITEM",
-          payload: {
-            pizzaId: 901, // ID for drinks
-            pizza: {
-              id: 901,
-              name: `שתייה קלה קטנה - ${drink.name}`,
-              description: "שתייה קלה לבחירה",
-              price: drink.price,
-              imageUrl: "",
-              available: true,
-              categoryId: 8,
-              allowsToppings: false,
-              allowsSizes: false,
-              allowsSauces: false,
-              isCustomizable: false,
-            },
-            size: "S",
-            quantity: 1,
-            toppingLayout: { layout: "full", sections: [[]] },
-            doughType: "thick",
+    // הוספת השתייה לעגלה
+    selectedDrinks.forEach(drink => {
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          pizzaId: drink.size === "small" ? 901 : 902,
+          pizza: {
+            id: drink.size === "small" ? 901 : 902,
+            name: `שתייה קלה ${drink.size === "small" ? "קטנה" : "גדולה"} - ${drink.name}`,
+            description: "שתייה קלה לבחירה",
+            price: drink.price,
+            imageUrl: "",
+            available: true,
+            categoryId: 8,
+            allowsToppings: false,
+            allowsSizes: false,
+            allowsSauces: false,
+            isCustomizable: false,
           },
-        });
-      }
-    }
-
-    if (selectedLargeDrink) {
-      const drink = DRINKS.large.find(d => d.id === selectedLargeDrink);
-      if (drink) {
-        dispatch({
-          type: "ADD_ITEM",
-          payload: {
-            pizzaId: 902, // ID for drinks
-            pizza: {
-              id: 902,
-              name: `שתייה קלה גדולה - ${drink.name}`,
-              description: "שתייה קלה לבחירה",
-              price: drink.price,
-              imageUrl: "",
-              available: true,
-              categoryId: 8,
-              allowsToppings: false,
-              allowsSizes: false,
-              allowsSauces: false,
-              isCustomizable: false,
-            },
-            size: "L",
-            quantity: 1,
-            toppingLayout: { layout: "full", sections: [[]] },
-            doughType: "thick",
-          },
-        });
-      }
-    }
+          size: drink.size === "small" ? "S" : "L",
+          quantity: drink.quantity,
+          toppingLayout: { layout: "full", sections: [[]] },
+          doughType: "thick",
+        },
+      });
+    });
 
     setLocation("/payment");
   };
@@ -342,7 +345,7 @@ export default function Cart() {
                   <div className="space-y-4">
                     <div>
                       <Label className="block text-right mb-2">שתייה קלה קטנה - ₪8</Label>
-                      <Select value={selectedSmallDrink} onValueChange={setSelectedSmallDrink}>
+                      <Select onValueChange={(value) => handleAddDrink("small", value)}>
                         <SelectTrigger className="w-full text-right">
                           <SelectValue placeholder="בחר שתייה קטנה" />
                         </SelectTrigger>
@@ -358,7 +361,7 @@ export default function Cart() {
 
                     <div>
                       <Label className="block text-right mb-2">שתייה קלה גדולה - ₪12</Label>
-                      <Select value={selectedLargeDrink} onValueChange={setSelectedLargeDrink}>
+                      <Select onValueChange={(value) => handleAddDrink("large", value)}>
                         <SelectTrigger className="w-full text-right">
                           <SelectValue placeholder="בחר שתייה גדולה" />
                         </SelectTrigger>
@@ -371,13 +374,55 @@ export default function Cart() {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
 
-                  {(selectedSmallDrink || selectedLargeDrink) && (
-                    <div className="mt-2 text-sm text-muted-foreground text-right">
-                      תוספת שתייה: ₪{(calculateDrinksTotal() / 100).toFixed(2)}
-                    </div>
-                  )}
+                    {/* רשימת השתייה שנבחרה */}
+                    {selectedDrinks.length > 0 && (
+                      <div className="space-y-2 mt-4">
+                        <Label className="block text-right">שתייה שנבחרה:</Label>
+                        <div className="space-y-2">
+                          {selectedDrinks.map((drink, index) => (
+                            <div key={`${drink.id}-${index}`} className="flex items-center justify-between p-2 border rounded">
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => handleRemoveDrink(index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                                <div className="flex items-center space-x-2 mx-2">
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => handleUpdateDrinkQuantity(index, -1)}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="w-8 text-center">{drink.quantity}</span>
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => handleUpdateDrinkQuantity(index, 1)}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div>{drink.name}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {drink.size === "small" ? "קטנה" : "גדולה"} - ₪{(drink.price * drink.quantity / 100).toFixed(2)}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="text-sm text-muted-foreground text-right">
+                          סה"כ שתייה: ₪{(calculateDrinksTotal() / 100).toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <Button type="submit" className="w-full">
