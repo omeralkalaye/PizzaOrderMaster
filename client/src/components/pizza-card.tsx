@@ -184,23 +184,34 @@ export function PizzaCard({
         isVeganCheese: selectedPizzas[0].isVeganCheese,
       });
     } else {
-      selectedPizzas.forEach((pizzaConfig) => {
-        dispatch({
-          type: "ADD_ITEM",
-          payload: {
-            pizzaId: pizza.id,
-            pizza,
-            size,
-            quantity: quantity,
-            toppingLayout: {
-              layout: pizzaConfig.layout,
-              sections: pizzaConfig.sections
+      // Add each pizza configuration with proper quantity division
+      const quantityPerPizza = Math.ceil(quantity / selectedPizzas.length);
+
+      selectedPizzas.forEach((pizzaConfig, index) => {
+        // For the last pizza, adjust quantity to match total
+        const isLastPizza = index === selectedPizzas.length - 1;
+        const pizzaQuantity = isLastPizza 
+          ? quantity - (quantityPerPizza * (selectedPizzas.length - 1))
+          : quantityPerPizza;
+
+        if (pizzaQuantity > 0) {
+          dispatch({
+            type: "ADD_ITEM",
+            payload: {
+              pizzaId: pizza.id,
+              pizza,
+              size,
+              quantity: pizzaQuantity,
+              toppingLayout: {
+                layout: pizzaConfig.layout,
+                sections: pizzaConfig.sections
+              },
+              doughType: pizzaConfig.doughType,
+              isCreamSauce: pizzaConfig.isCreamSauce,
+              isVeganCheese: pizzaConfig.isVeganCheese,
             },
-            doughType: pizzaConfig.doughType,
-            isCreamSauce: pizzaConfig.isCreamSauce,
-            isVeganCheese: pizzaConfig.isVeganCheese,
-          },
-        });
+          });
+        }
       });
     }
     setIsDialogOpen(false);
