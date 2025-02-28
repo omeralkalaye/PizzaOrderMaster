@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, ReactNode } from "react";
-import { Pizza, PizzaOrderItem, PizzaSize, ToppingLayout } from "@shared/schema";
+import { Pizza, PizzaOrderItem } from "@shared/schema";
 
 interface CartItem extends PizzaOrderItem {
   pizza: Pizza;
@@ -7,6 +7,7 @@ interface CartItem extends PizzaOrderItem {
   isVeganCheese?: boolean;
   isGratin?: boolean; // אופציית הקרמה עבור לחם שום
   sauceId?: string; // אופציית הרוטב עבור פסטות
+  hasParmesan?: boolean; // אופציית פרמז'ן עבור פסטות
 }
 
 interface CartState {
@@ -36,6 +37,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           item.isVeganCheese === action.payload.isVeganCheese &&
           item.isGratin === action.payload.isGratin &&
           item.sauceId === action.payload.sauceId &&
+          item.hasParmesan === action.payload.hasParmesan &&
           JSON.stringify(item.toppingLayout) === JSON.stringify(action.payload.toppingLayout)
       );
 
@@ -91,7 +93,6 @@ export function useCart() {
 
 export function calculateTotal(items: CartItem[]): number {
   return items.reduce((total, item) => {
-    // Calculate base price
     let itemTotal = item.pizza.price;
 
     // Add cream sauce price if selected
@@ -102,6 +103,11 @@ export function calculateTotal(items: CartItem[]): number {
     // Add gratin price if selected (for garlic bread)
     if (item.isGratin) {
       itemTotal += 300; // 3₪ for gratin
+    }
+
+    // Add parmesan price if selected (for pasta)
+    if (item.hasParmesan) {
+      itemTotal += 300; // 3₪ for parmesan
     }
 
     // Add toppings price

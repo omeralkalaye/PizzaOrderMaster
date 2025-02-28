@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Minus, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ const SAUCE_OPTIONS = [
   { id: "pesto", name: "פסטו", price: 0 },
 ];
 
+const PARMESAN_PRICE = 300; // 3₪ לתוספת פרמז'ן
+
 interface PastaCardProps {
   item: MenuItem;
   defaultSize?: "S" | "M" | "L" | "XL";
@@ -45,6 +48,7 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [sauceChoices, setSauceChoices] = useState<string[]>(["cream"]);
+  const [parmesanChoices, setParmesanChoices] = useState<boolean[]>([false]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const updateQuantity = (newQuantity: number) => {
@@ -53,6 +57,12 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
     setSauceChoices(prev => {
       if (validQuantity > prev.length) {
         return [...prev, ...Array(validQuantity - prev.length).fill("cream")];
+      }
+      return prev.slice(0, validQuantity);
+    });
+    setParmesanChoices(prev => {
+      if (validQuantity > prev.length) {
+        return [...prev, ...Array(validQuantity - prev.length).fill(false)];
       }
       return prev.slice(0, validQuantity);
     });
@@ -66,14 +76,24 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
     });
   };
 
+  const toggleParmesan = (index: number) => {
+    setParmesanChoices(prev => {
+      const newChoices = [...prev];
+      newChoices[index] = !newChoices[index];
+      return newChoices;
+    });
+  };
+
   const calculateTotalPrice = () => {
     const basePrice = item.price;
-    return basePrice * quantity;
+    const parmesanPrice = parmesanChoices.reduce((total, hasParmesan) => 
+      total + (hasParmesan ? PARMESAN_PRICE : 0), 0);
+    return basePrice * quantity + parmesanPrice;
   };
 
   const handleAddToCart = () => {
-    // Add each pasta as a separate item with its own sauce choice
-    sauceChoices.forEach((sauceId) => {
+    // Add each pasta as a separate item with its own sauce choice and parmesan option
+    sauceChoices.forEach((sauceId, index) => {
       dispatch({
         type: "ADD_ITEM",
         payload: {
@@ -88,12 +108,14 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
           isCreamSauce: false,
           isVeganCheese: false,
           sauceId,
+          hasParmesan: parmesanChoices[index],
         },
       });
     });
     setIsDialogOpen(false);
     setQuantity(1);
     setSauceChoices(["cream"]);
+    setParmesanChoices([false]);
   };
 
   return (
@@ -149,11 +171,10 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
               </div>
 
               <div className="space-y-4">
-                <Label className="block text-right mb-2">בחירת רוטב:</Label>
-                {sauceChoices.map((sauceId, index) => {
-                  const selectedSauce = SAUCE_OPTIONS.find(s => s.id === sauceId);
-                  return (
-                    <div key={index} className="flex items-center justify-between border p-3 rounded-lg">
+                <Label className="block text-right mb-2">הגדרות למנה:</Label>
+                {sauceChoices.map((sauceId, index) => (
+                  <div key={index} className="space-y-4 border p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
                       <Select
                         value={sauceId}
                         onValueChange={(value) => updateSauce(index, value)}
@@ -169,10 +190,18 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Label>מנה {index + 1}</Label>
+                      <Label>רוטב למנה {index + 1}</Label>
                     </div>
-                  );
-                })}
+
+                    <div className="flex items-center justify-between">
+                      <Switch
+                        checked={parmesanChoices[index]}
+                        onCheckedChange={() => toggleParmesan(index)}
+                      />
+                      <Label>פרמז'ן בצד (+ ₪3)</Label>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="mt-4 p-4 border rounded-lg">
