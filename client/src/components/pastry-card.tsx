@@ -191,9 +191,26 @@ export function PastryCard({ item }: PastryCardProps) {
                 </div>
               </div>
 
+              {/* הסרת מרכיבים */}
+              <div className="space-y-4">
+                <Label className="block mb-2">הסר מרכיבים:</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {getAvailableIngredients().map((ingredient) => (
+                    <div key={ingredient} className="flex items-center justify-between p-2 border rounded">
+                      <Label htmlFor={`remove-${ingredient}-${currentItemIndex}`}>{ingredient}</Label>
+                      <Switch
+                        id={`remove-${ingredient}-${currentItemIndex}`}
+                        checked={itemsRemovedIngredients[currentItemIndex]?.includes(ingredient)}
+                        onCheckedChange={() => toggleIngredient(ingredient)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {quantity > 1 && (
                 <div className="space-y-4">
-                  <Label className="block">הגדרות לכל פריט:</Label>
+                  <Label className="block">הגדרות לפריטים נוספים:</Label>
                   <Tabs value={currentItemIndex.toString()} onValueChange={(value) => setCurrentItemIndex(parseInt(value))}>
                     <TabsList className="w-full flex flex-row-reverse">
                       {Array.from({ length: quantity }, (_, index) => (
@@ -226,6 +243,7 @@ export function PastryCard({ item }: PastryCardProps) {
 
               <div className="border-t pt-4">
                 <Label className="block mb-4 text-lg">תוספות משותפות לכל הפריטים:</Label>
+
                 {/* חריף */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between flex-row-reverse">
