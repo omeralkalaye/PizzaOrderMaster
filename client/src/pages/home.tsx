@@ -5,24 +5,22 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div 
-        className="relative h-[70vh] flex items-center justify-center bg-cover bg-center bg-black"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1594375188248-174763da4d69)',
-          backgroundBlendMode: 'overlay',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)'
-        }}
-      >
-        <div className="text-center text-white z-10 px-4">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-yellow-400">
-            פיצה פצץ קדימה
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
-            מרכיבים טריים, מתכונים מסורתיים ומשלוח מהיר עד דלתך
-          </p>
+      <div className="h-[70vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
+        <div className="text-center px-4">
+          {/* לוגו גדול */}
+          <img 
+            src="/logo.png" 
+            alt="פיצה פצץ קדימה" 
+            className="w-64 md:w-96 mx-auto mb-8 animate-bounce"
+          />
+
+          {/* כפתור הזמנה מעוצב */}
           <Link href="/menu">
-            <Button size="lg" className="text-lg px-8 bg-red-600 hover:bg-red-700 text-white">
-              הזמן עכשיו
+            <Button 
+              size="lg" 
+              className="text-xl px-12 py-6 rounded-full bg-gradient-to-r from-yellow-400 via-red-500 to-yellow-400 hover:from-yellow-500 hover:via-red-600 hover:to-yellow-500 text-white font-bold transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              הזמן עכשיו 🍕
             </Button>
           </Link>
         </div>
@@ -50,32 +48,32 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Gallery Section */}
-      <div className="bg-black py-16">
+      {/* Gallery Section - עם רקע לבן במקום שחור */}
+      <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8 text-yellow-400">
+          <h2 className="text-3xl font-bold text-center mb-8 text-red-600">
             הפיצות שלנו
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <img
               src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca"
               alt="פיצה מרגריטה"
-              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity shadow-md"
             />
             <img
               src="https://images.unsplash.com/photo-1585238342024-78d387f4a707"
               alt="פיצה ארבע גבינות"
-              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity shadow-md"
             />
             <img
               src="https://images.unsplash.com/photo-1571066811602-716837d681de"
               alt="פיצה פטריות"
-              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity shadow-md"
             />
             <img
               src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e"
               alt="פיצה ירקות"
-              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity"
+              className="rounded-lg aspect-square object-cover hover:opacity-80 transition-opacity shadow-md"
             />
           </div>
         </div>
