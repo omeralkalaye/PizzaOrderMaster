@@ -102,7 +102,6 @@ export function Nav() {
 
             {/* Mobile Navigation */}
             <div className="sm:hidden flex items-center gap-2">
-              {/* כפתור בית למובייל */}
               {!isAdmin && location !== "/" && (
                 <Link href="/">
                   <Button
@@ -114,7 +113,6 @@ export function Nav() {
                   </Button>
                 </Link>
               )}
-              {/* כפתור סל קניות למובייל */}
               {!isAdmin && (
                 <Link href="/cart">
                   <Button variant="outline" size="icon" className="relative bg-transparent border-yellow-400 text-yellow-400">

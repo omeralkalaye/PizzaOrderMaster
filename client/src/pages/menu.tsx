@@ -127,6 +127,8 @@ export default function Menu() {
                     setLocation("/garlic-bread-menu");
                   } else if (category.name === "פסטות" || category.name === "רביולי") {
                     setLocation("/pasta-menu");
+                  } else if (category.name === "מאפים") {
+                    setLocation("/pastries-menu");
                   }
                 }}
               >
