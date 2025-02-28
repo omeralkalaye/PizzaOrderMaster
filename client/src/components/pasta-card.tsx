@@ -86,13 +86,12 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
 
   const calculateTotalPrice = () => {
     const basePrice = item.price;
-    const parmesanPrice = parmesanChoices.reduce((total, hasParmesan) => 
+    const parmesanPrice = parmesanChoices.reduce((total, hasParmesan) =>
       total + (hasParmesan ? PARMESAN_PRICE : 0), 0);
     return basePrice * quantity + parmesanPrice;
   };
 
   const handleAddToCart = () => {
-    // Add each pasta as a separate item with its own sauce choice and parmesan option
     sauceChoices.forEach((sauceId, index) => {
       dispatch({
         type: "ADD_ITEM",
@@ -144,7 +143,7 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
           <DialogTrigger asChild>
             <Button className="w-full">בחר</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto my-8">
             <DialogHeader>
               <DialogTitle className="text-center">{item.name}</DialogTitle>
             </DialogHeader>

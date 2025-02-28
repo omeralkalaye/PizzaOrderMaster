@@ -54,7 +54,7 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
 
   const calculateTotalPrice = () => {
     const basePrice = item.price;
-    const gratinPrice = gratinChoices.reduce((total, isGratin) => 
+    const gratinPrice = gratinChoices.reduce((total, isGratin) =>
       total + (isGratin ? CREAM_PRICE : 0), 0);
     return basePrice * quantity + gratinPrice;
   };
@@ -109,7 +109,7 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
           <DialogTrigger asChild>
             <Button className="w-full">בחר</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto my-8">
             <DialogHeader>
               <DialogTitle className="text-center">התאם את {item.name} לטעמך</DialogTitle>
             </DialogHeader>
