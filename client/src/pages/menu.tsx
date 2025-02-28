@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { BakedPotatoCard } from "@/components/baked-potato-card";
-import { SaladCard } from "@/components/salad-card"; // Added import
+import { SaladCard } from "@/components/salad-card";
 
 type MenuData = {
   categories: Category[];
@@ -16,10 +16,9 @@ const CATEGORY_IMAGES = {
   "לחם שום": "https://images.unsplash.com/photo-1573140401552-3fab0b24306f",
   "פסטות": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
   "רביולי": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a",
-  "תפוח אדמה מוקרם": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4",
+  "תפוח אדמה מוקרם": "https://images.unsplash.com/photo-1585148859494-dd5959e5c6e6",
   "סלטים": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
   "משקאות": "https://images.unsplash.com/photo-1544145945-f90425340c7e",
-  "תוספות חמות": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4"
 };
 
 const CATEGORY_DESCRIPTIONS = {
@@ -84,14 +83,37 @@ export default function Menu() {
             const displayName = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
             const imageKey = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
 
-            // אם זה תפוח אדמה מוקרם, נציג את הכרטיסייה עם אפשרויות הבחירה
+            // אם זה תפוח אדמה מוקרם או סלט, נציג את הכרטיסייה עם אפשרויות הבחירה
+            const item = items[0];
+            const image = CATEGORY_IMAGES[imageKey as keyof typeof CATEGORY_IMAGES] || "";
+            const description = CATEGORY_DESCRIPTIONS[imageKey as keyof typeof CATEGORY_DESCRIPTIONS] || "";
+
             if (category.name === "תוספות חמות") {
-              return <BakedPotatoCard key={category.id} item={items[0]} />;
+              return (
+                <BakedPotatoCard 
+                  key={category.id} 
+                  item={{
+                    ...item,
+                    name: displayName,
+                    description: description,
+                    imageUrl: image,
+                  }}
+                />
+              );
             }
 
-            // אם זה סלט, נציג את הכרטיסייה עם אפשרויות הבחירה
             if (category.name === "סלטים") {
-              return <SaladCard key={category.id} item={items[0]} />; // Added SaladCard rendering
+              return (
+                <SaladCard 
+                  key={category.id} 
+                  item={{
+                    ...item,
+                    name: displayName,
+                    description: description,
+                    imageUrl: image,
+                  }}
+                />
+              );
             }
 
             return (
@@ -110,7 +132,7 @@ export default function Menu() {
               >
                 <div className="aspect-video relative">
                   <img
-                    src={CATEGORY_IMAGES[imageKey as keyof typeof CATEGORY_IMAGES] || ""}
+                    src={image}
                     alt={displayName}
                     className="object-cover w-full h-full"
                   />
@@ -120,9 +142,7 @@ export default function Menu() {
                     <div>
                       <h2 className="text-2xl font-semibold mb-2">{displayName}</h2>
                       <p className="text-muted-foreground">
-                        {CATEGORY_DESCRIPTIONS[imageKey as keyof typeof CATEGORY_DESCRIPTIONS] ||
-                          category.description ||
-                          `${items.length} פריטים`}
+                        {description}
                       </p>
                     </div>
                   </div>
