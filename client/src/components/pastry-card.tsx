@@ -193,12 +193,12 @@ export function PastryCard({ item }: PastryCardProps) {
 
               {/* הסרת מרכיבים בתוך מערכת הלשוניות */}
               <div className="space-y-4">
-                <Label className="block">התאמה אישית לכל פריט:</Label>
+                <Label className="block">התאמה אישית לכל מנה:</Label>
                 <Tabs value={currentItemIndex.toString()} onValueChange={(value) => setCurrentItemIndex(parseInt(value))}>
                   <TabsList className="w-full flex flex-row-reverse">
                     {Array.from({ length: quantity }, (_, index) => (
                       <TabsTrigger key={index} value={index.toString()}>
-                        פריט {index + 1}
+                        מנה {index + 1}
                       </TabsTrigger>
                     ))}
                   </TabsList>
