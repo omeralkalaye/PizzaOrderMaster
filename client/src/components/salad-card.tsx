@@ -202,12 +202,12 @@ export function SaladCard({ item }: SaladCardProps) {
               {selectedIngredients.map((saladIngredients, saladIndex) => (
                 <TabsContent key={saladIndex} value={saladIndex.toString()}>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-row-reverse">
+                      <Label>ביצה קשה (+ ₪3)</Label>
                       <Switch
                         checked={hasBoiledEgg[saladIndex]}
                         onCheckedChange={() => toggleBoiledEgg(saladIndex)}
                       />
-                      <Label>ביצה קשה (+ ₪3)</Label>
                     </div>
 
                     <Label className="block text-right mb-2">בחירת מרכיבים:</Label>
