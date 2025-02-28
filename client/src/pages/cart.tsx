@@ -11,19 +11,19 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PizzaCard } from "@/components/pizza-card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CartItem } from "@/types/cart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useDelivery } from "@/lib/delivery-context";
 
 const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
   phone: z.string().min(10, "נא להזין מספר טלפון תקין"),
-  deliveryType: z.enum(["delivery", "pickup"]),
   address: z.string().optional(),
 }).refine(
   (data) => {
-    if (data.deliveryType === "delivery") {
+    // בדיקה שהכתובת הוזנה אם זה משלוח
+    if (window.deliveryType === "delivery") {
       return data.address && data.address.length >= 5;
     }
     return true;
@@ -65,26 +65,24 @@ export default function Cart() {
   const [, setLocation] = useLocation();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
   const [selectedDrinks, setSelectedDrinks] = useState<DrinkSelection[]>([]);
+  const { deliveryType, getPriceMultiplier } = useDelivery();
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
       customerName: "",
       phone: "",
-      deliveryType: "delivery",
       address: "",
     },
-    mode: "onSubmit", // שינוי זה יגרום לולידציה להתבצע רק בהגשת הטופס
+    mode: "onSubmit",
   });
-
-  const deliveryType = form.watch("deliveryType");
 
   const calculateDrinksTotal = () => {
     return selectedDrinks.reduce((total, drink) => total + drink.price * drink.quantity, 0);
   };
 
   const calculateFinalTotal = () => {
-    return calculateTotal(items) + calculateDrinksTotal();
+    return (calculateTotal(items) + calculateDrinksTotal()) * getPriceMultiplier();
   };
 
   const handleAddDrink = (size: "small" | "large", drinkId: string) => {
@@ -122,6 +120,16 @@ export default function Cart() {
       toast({
         title: "הסל ריק",
         description: "נא להוסיף פריטים לסל לפני ביצוע ההזמנה.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // בדיקת מינימום הזמנה למשלוח
+    if (deliveryType === "delivery" && calculateFinalTotal() < 5500) {
+      toast({
+        title: "מינימום הזמנה למשלוח",
+        description: "סכום ההזמנה למשלוח חייב להיות מעל 55₪",
         variant: "destructive",
       });
       return;
@@ -186,19 +194,13 @@ export default function Cart() {
                 >
                   <div>
                     <h3 className="font-medium">{item.pizza.name} - {item.size}</h3>
-                    {item.isCreamSauce && (
-                      <p className="text-sm text-muted-foreground">רוטב שמנת</p>
-                    )}
-                    {item.isVeganCheese && (
-                      <p className="text-sm text-muted-foreground">גבינה טבעונית</p>
-                    )}
                     {item.toppingLayout.sections.flat().length > 0 && (
                       <p className="text-sm text-muted-foreground">
                         {item.toppingLayout.sections.flat().length} תוספות
                       </p>
                     )}
                     <p className="text-sm text-muted-foreground">
-                      ₪{((item.pizza.price * item.quantity) / 100).toFixed(2)}
+                      ₪{((item.pizza.price * item.quantity * getPriceMultiplier()) / 100).toFixed(2)}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -259,9 +261,14 @@ export default function Cart() {
 
             <div className="mt-4 p-4 border rounded-lg">
               <div className="flex justify-between text-lg font-bold">
-                <span>₪{(calculateTotal(items) / 100).toFixed(2)}</span>
-                <span>:סה"כ לתשלום (ללא שתייה)</span>
+                <span>₪{(calculateFinalTotal() / 100).toFixed(2)}</span>
+                <span>:סה"כ לתשלום</span>
               </div>
+              {deliveryType === "delivery" && (
+                <p className="text-sm text-muted-foreground text-right mt-2">
+                  * מינימום הזמנה למשלוח: ₪55
+                </p>
+              )}
             </div>
           </div>
 
@@ -380,32 +387,7 @@ export default function Cart() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="deliveryType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>אופן קבלת ההזמנה</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          className="flex flex-col gap-4"
-                        >
-                          <div className="flex items-center justify-end space-x-reverse space-x-2">
-                            <label htmlFor="delivery">משלוח</label>
-                            <RadioGroupItem value="delivery" id="delivery" />
-                          </div>
-                          <div className="flex items-center justify-end space-x-reverse space-x-2">
-                            <label htmlFor="pickup">איסוף עצמי</label>
-                            <RadioGroupItem value="pickup" id="pickup" />
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
                 {deliveryType === "delivery" && (
                   <FormField
                     control={form.control}

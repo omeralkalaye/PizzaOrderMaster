@@ -1,7 +1,18 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useDelivery } from "@/lib/delivery-context";
 
 export default function Home() {
+  const { setDeliveryType } = useDelivery();
+
+  const handleDeliveryOrder = () => {
+    setDeliveryType('delivery');
+  };
+
+  const handlePickupOrder = () => {
+    setDeliveryType('pickup');
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -16,15 +27,27 @@ export default function Home() {
             />
           </div>
 
-          {/* כפתור הזמנה מעוצב */}
-          <Link href="/menu">
-            <Button 
-              size="lg" 
-              className="text-xl px-12 py-6 rounded-full bg-gradient-to-r from-yellow-400 via-red-500 to-yellow-400 hover:from-yellow-500 hover:via-red-600 hover:to-yellow-500 text-white font-bold transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              הזמן עכשיו 🍕
-            </Button>
-          </Link>
+          {/* כפתורי הזמנה מעוצבים */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/menu">
+              <Button 
+                size="lg" 
+                onClick={handleDeliveryOrder}
+                className="text-xl px-12 py-6 rounded-full bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-red-600 hover:via-red-700 hover:to-red-600 text-white font-bold transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto"
+              >
+                הזמן למשלוח 🛵
+              </Button>
+            </Link>
+            <Link href="/menu">
+              <Button 
+                size="lg" 
+                onClick={handlePickupOrder}
+                className="text-xl px-12 py-6 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-500 text-white font-bold transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto"
+              >
+                הזמן לאיסוף עצמי 🍕
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
