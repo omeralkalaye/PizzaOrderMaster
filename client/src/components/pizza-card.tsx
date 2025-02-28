@@ -54,7 +54,7 @@ export function PizzaCard({
   const { dispatch } = useCart();
   const [size] = useState<PizzaSize>(existingItem?.size || defaultSize);
   const [quantity, setQuantity] = useState(existingItem?.quantity || 1);
-  const [doughType, setDoughType] = useState<DoughType>(existingItem?.doughType || "thin");
+  const [doughType, setDoughType] = useState<DoughType>(existingItem?.doughType || "thick");
   const [selectedPizzas, setSelectedPizzas] = useState<Array<{
     layout: ToppingLayout;
     sections: number[][];
@@ -66,13 +66,13 @@ export function PizzaCard({
     sections: existingItem.toppingLayout.sections,
     isCreamSauce: existingItem.isCreamSauce || false,
     isVeganCheese: existingItem.isVeganCheese || false,
-    doughType: existingItem.doughType || "thin",
+    doughType: existingItem.doughType || "thick",
   }] : [{
     layout: "full",
     sections: [[]],
     isCreamSauce: false,
     isVeganCheese: false,
-    doughType: "thin",
+    doughType: "thick",
   }]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPizzaIndex, setCurrentPizzaIndex] = useState(0);
@@ -92,7 +92,7 @@ export function PizzaCard({
           sections: [[]],
           isCreamSauce: false,
           isVeganCheese: false,
-          doughType: "thin",
+          doughType: "thick",
         })];
       }
       return prev.slice(0, validQuantity);
@@ -210,7 +210,7 @@ export function PizzaCard({
       sections: [[]],
       isCreamSauce: false,
       isVeganCheese: false,
-      doughType: "thin",
+      doughType: "thick",
     }]);
     setCurrentPizzaIndex(0);
   };
