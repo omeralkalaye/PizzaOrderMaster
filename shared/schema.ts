@@ -5,6 +5,7 @@ import { relations } from "drizzle-orm";
 
 // מידות עבור פריטים שונים
 export type ItemSize = "S" | "M" | "L" | "XL";
+export type DoughType = "thin" | "thick"; // Add after ItemSize type definition
 export type DeliveryType = "delivery" | "pickup";
 export type ToppingLayout = "full" | "half" | "quarter";
 
@@ -143,11 +144,13 @@ export const toppingLayoutSchema = z.object({
     .max(4), // 1 section for full, 2 for half, 4 for quarter
 });
 
+// Update pizzaOrderItemSchema to include doughType
 export const pizzaOrderItemSchema = z.object({
   pizzaId: z.number(),
   size: z.enum(["S", "M", "L", "XL"]),
   quantity: z.number().min(1),
   toppingLayout: toppingLayoutSchema,
+  doughType: z.enum(["thin", "thick"]), // Added dough type
 });
 
 export const orders = pgTable("orders", {

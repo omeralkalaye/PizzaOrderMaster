@@ -1,4 +1,4 @@
-import { Pizza, PizzaSize, pizzaSizes, ToppingLayout } from "@shared/schema";
+import { Pizza, PizzaSize, pizzaSizes, ToppingLayout, DoughType } from "@shared/schema";
 import {
   Card,
   CardContent,
@@ -37,8 +37,8 @@ interface PizzaCardProps {
   isAdmin?: boolean;
   onEdit?: (pizza: Pizza) => void;
   defaultSize?: PizzaSize;
-  existingItem?: CartItem; 
-  onUpdate?: (updatedItem: CartItem) => void; 
+  existingItem?: CartItem;
+  onUpdate?: (updatedItem: CartItem) => void;
 }
 
 const CREAM_SAUCE_PRICE = 500; 
@@ -54,21 +54,25 @@ export function PizzaCard({
   const { dispatch } = useCart();
   const [size] = useState<PizzaSize>(existingItem?.size || defaultSize);
   const [quantity, setQuantity] = useState(existingItem?.quantity || 1);
+  const [doughType, setDoughType] = useState<DoughType>(existingItem?.doughType || "thin");
   const [selectedPizzas, setSelectedPizzas] = useState<Array<{
     layout: ToppingLayout;
     sections: number[][];
     isCreamSauce: boolean;
     isVeganCheese: boolean;
+    doughType: DoughType;
   }>>(existingItem ? [{
     layout: existingItem.toppingLayout.layout,
     sections: existingItem.toppingLayout.sections,
     isCreamSauce: existingItem.isCreamSauce || false,
     isVeganCheese: existingItem.isVeganCheese || false,
+    doughType: existingItem.doughType || "thin",
   }] : [{
     layout: "full",
     sections: [[]],
     isCreamSauce: false,
     isVeganCheese: false,
+    doughType: "thin",
   }]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPizzaIndex, setCurrentPizzaIndex] = useState(0);
@@ -88,6 +92,7 @@ export function PizzaCard({
           sections: [[]],
           isCreamSauce: false,
           isVeganCheese: false,
+          doughType: "thin",
         })];
       }
       return prev.slice(0, validQuantity);
@@ -174,6 +179,7 @@ export function PizzaCard({
           layout: selectedPizzas[0].layout,
           sections: selectedPizzas[0].sections
         },
+        doughType: selectedPizzas[0].doughType,
         isCreamSauce: selectedPizzas[0].isCreamSauce,
         isVeganCheese: selectedPizzas[0].isVeganCheese,
       });
@@ -190,6 +196,7 @@ export function PizzaCard({
               layout: pizzaConfig.layout,
               sections: pizzaConfig.sections
             },
+            doughType: pizzaConfig.doughType,
             isCreamSauce: pizzaConfig.isCreamSauce,
             isVeganCheese: pizzaConfig.isVeganCheese,
           },
@@ -203,8 +210,20 @@ export function PizzaCard({
       sections: [[]],
       isCreamSauce: false,
       isVeganCheese: false,
+      doughType: "thin",
     }]);
     setCurrentPizzaIndex(0);
+  };
+
+  const updatePizzaDoughType = (pizzaIndex: number, doughType: DoughType) => {
+    setSelectedPizzas(pizzas => {
+      const newPizzas = [...pizzas];
+      newPizzas[pizzaIndex] = {
+        ...newPizzas[pizzaIndex],
+        doughType,
+      };
+      return newPizzas;
+    });
   };
 
   const currentPizza = selectedPizzas[currentPizzaIndex];
@@ -249,6 +268,25 @@ export function PizzaCard({
               </DialogHeader>
 
               <div className="space-y-4">
+                <div className="space-y-4">
+                  <Label className="block text-right">סוג בצק:</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant={selectedPizzas[currentPizzaIndex].doughType === "thin" ? "secondary" : "outline"}
+                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thin")}
+                      className="justify-end"
+                    >
+                      בצק דק
+                    </Button>
+                    <Button
+                      variant={selectedPizzas[currentPizzaIndex].doughType === "thick" ? "secondary" : "outline"}
+                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thick")}
+                      className="justify-end"
+                    >
+                      בצק עבה
+                    </Button>
+                  </div>
+                </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Button
