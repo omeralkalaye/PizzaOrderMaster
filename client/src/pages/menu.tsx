@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { PizzaCard } from "@/components/pizza-card";
 import { Category, MenuItem } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +8,26 @@ type MenuData = {
   categories: Category[];
   menuItems: MenuItem[];
 }
+
+const CATEGORY_IMAGES = {
+  "פיצות": "https://images.unsplash.com/photo-1513104890138-7c749659a591",
+  "לחם שום": "https://images.unsplash.com/photo-1591985666643-1ecc67616216",
+  "פסטות": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
+  "רביולי": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a",
+  "תוספות חמות": "https://images.unsplash.com/photo-1585148859491-003ab477e3d4", // תפוחי אדמה מוקרמים
+  "סלטים": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
+  "משקאות": "https://images.unsplash.com/photo-1544145945-f90425340c7e",
+};
+
+const CATEGORY_DESCRIPTIONS = {
+  "פיצות": "מגוון פיצות טריות בכל הגדלים",
+  "לחם שום": "לחם שום טרי בתוספת גבינה",
+  "פסטות": "פסטות באיכות מעולה",
+  "רביולי": "רביולי באיכות מעולה במגוון מליות",
+  "תוספות חמות": "תפוח אדמה מוקרם",
+  "סלטים": "סלטים טריים ומרעננים",
+  "משקאות": "מבחר משקאות קרים",
+};
 
 export default function Menu() {
   const [, setLocation] = useLocation();
@@ -62,7 +81,7 @@ export default function Menu() {
             return (
               <Card 
                 key={category.id} 
-                className="cursor-pointer hover:bg-accent/5 transition-colors"
+                className="cursor-pointer hover:bg-accent/5 transition-colors overflow-hidden"
                 onClick={() => {
                   if (category.name === "פיצות") {
                     setLocation("/pizza-menu");
@@ -71,11 +90,24 @@ export default function Menu() {
                   }
                 }}
               >
+                <div className="aspect-video relative">
+                  <img
+                    src={CATEGORY_IMAGES[category.name as keyof typeof CATEGORY_IMAGES] || ""}
+                    alt={category.name}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-semibold mb-2">{category.name}</h2>
-                  <p className="text-muted-foreground">
-                    {category.description || `${items.length} פריטים`}
-                  </p>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-2xl font-semibold mb-2">{category.name}</h2>
+                      <p className="text-muted-foreground">
+                        {CATEGORY_DESCRIPTIONS[category.name as keyof typeof CATEGORY_DESCRIPTIONS] || 
+                          category.description || 
+                          `${items.length} פריטים`}
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             );
