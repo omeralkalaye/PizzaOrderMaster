@@ -47,16 +47,6 @@ export function Nav() {
                   <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-14 w-auto" />
                 </a>
               </Link>
-              {/* כפתור בית */}
-              <Link href="/">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="ml-4 bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                >
-                  <Home className="h-5 w-5" />
-                </Button>
-              </Link>
               {/* כפתור חזרה */}
               {location !== "/" && (
                 <Button
@@ -84,21 +74,46 @@ export function Nav() {
               ))}
 
               {!isAdmin && (
-                <Link href="/cart">
-                  <Button variant="outline" className="relative bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black">
-                    <ShoppingCart className="h-5 w-5 ml-2" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                        {itemCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+                <>
+                  {location !== "/" && (
+                    <Link href="/">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      >
+                        <Home className="h-5 w-5" />
+                      </Button>
+                    </Link>
+                  )}
+                  <Link href="/cart">
+                    <Button variant="outline" className="relative bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black">
+                      <ShoppingCart className="h-5 w-5 ml-2" />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                          {itemCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                </>
               )}
             </div>
 
             {/* Mobile Navigation */}
             <div className="sm:hidden flex items-center gap-2">
+              {/* כפתור בית למובייל */}
+              {!isAdmin && location !== "/" && (
+                <Link href="/">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="bg-transparent border-yellow-400 text-yellow-400"
+                  >
+                    <Home className="h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
               {/* כפתור סל קניות למובייל */}
               {!isAdmin && (
                 <Link href="/cart">
