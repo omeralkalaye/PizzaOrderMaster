@@ -291,25 +291,15 @@ export function PizzaCard({
                 </div>
 
                 {/* סוג בצק */}
-                <div className="space-y-4">
-                  <Label className="block text-right">סוג בצק:</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      variant={selectedPizzas[currentPizzaIndex].doughType === "thin" ? "secondary" : "outline"}
-                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thin")}
-                      className="justify-end"
-                    >
-                      בצק דק
-                    </Button>
-                    <Button
-                      variant={selectedPizzas[currentPizzaIndex].doughType === "thick" ? "secondary" : "outline"}
-                      onClick={() => updatePizzaDoughType(currentPizzaIndex, "thick")}
-                      className="justify-end"
-                    >
-                      בצק עבה
-                    </Button>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <Switch
+                    id={`thin-dough-${currentPizzaIndex}`}
+                    checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
+                    onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
+                  />
+                  <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
                 </div>
+
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
                   <TabsList className="w-full flex-row-reverse">
                     {selectedPizzas.map((_, index) => (
