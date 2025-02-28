@@ -269,7 +269,7 @@ export function PizzaCard({
 
               <div className="space-y-4">
                 {/* כמות מגשים */}
-                <div className="flex items-center justify-between flex-row-reverse"> {/* Added flex-row-reverse */}
+                <div className="flex items-center justify-between flex-row-reverse">
                   <Label>כמות מגשים</Label>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -290,40 +290,8 @@ export function PizzaCard({
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  {/* בצק דק */}
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <Label htmlFor={`thin-dough-${currentPizzaIndex}`}>בצק דק</Label>
-                    <Switch
-                      id={`thin-dough-${currentPizzaIndex}`}
-                      checked={selectedPizzas[currentPizzaIndex].doughType === "thin"}
-                      onCheckedChange={(checked) => updatePizzaDoughType(currentPizzaIndex, checked ? "thin" : "thick")}
-                    />
-                  </div>
-
-                  {/* רוטב שמנת */}
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <Label htmlFor={`cream-sauce-${currentPizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
-                    <Switch
-                      id={`cream-sauce-${currentPizzaIndex}`}
-                      checked={selectedPizzas[currentPizzaIndex].isCreamSauce}
-                      onCheckedChange={(checked) => updatePizzaSauce(currentPizzaIndex, checked)}
-                    />
-                  </div>
-
-                  {/* גבינה טבעונית */}
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <Label htmlFor={`vegan-cheese-${currentPizzaIndex}`}>גבינה טבעונית</Label>
-                    <Switch
-                      id={`vegan-cheese-${currentPizzaIndex}`}
-                      checked={selectedPizzas[currentPizzaIndex].isVeganCheese}
-                      onCheckedChange={(checked) => updatePizzaCheese(currentPizzaIndex, checked)}
-                    />
-                  </div>
-                </div>
-
                 <Tabs value={currentPizzaIndex.toString()} onValueChange={(value) => setCurrentPizzaIndex(parseInt(value))}>
-                  <TabsList className="w-full flex flex-row-reverse"> {/* Added flex-row-reverse */}
+                  <TabsList className="w-full flex flex-row-reverse">
                     {selectedPizzas.map((_, index) => (
                       <TabsTrigger key={index} value={index.toString()}>
                         מגש {index + 1}
@@ -333,8 +301,19 @@ export function PizzaCard({
 
                   {selectedPizzas.map((pizzaConfig, pizzaIndex) => (
                     <TabsContent key={pizzaIndex} value={pizzaIndex.toString()}>
-                      <div className="space-y-4 mb-4">
-                        <div className="flex items-center justify-between flex-row-reverse"> {/* Added flex-row-reverse */}
+                      <div className="space-y-4">
+                        {/* בצק דק */}
+                        <div className="flex items-center justify-between flex-row-reverse">
+                          <Label htmlFor={`thin-dough-${pizzaIndex}`}>בצק דק</Label>
+                          <Switch
+                            id={`thin-dough-${pizzaIndex}`}
+                            checked={pizzaConfig.doughType === "thin"}
+                            onCheckedChange={(checked) => updatePizzaDoughType(pizzaIndex, checked ? "thin" : "thick")}
+                          />
+                        </div>
+
+                        {/* רוטב שמנת */}
+                        <div className="flex items-center justify-between flex-row-reverse">
                           <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                           <Switch
                             id={`cream-sauce-${pizzaIndex}`}
@@ -342,7 +321,9 @@ export function PizzaCard({
                             onCheckedChange={(checked) => updatePizzaSauce(pizzaIndex, checked)}
                           />
                         </div>
-                        <div className="flex items-center justify-between flex-row-reverse"> {/* Added flex-row-reverse */}
+
+                        {/* גבינה טבעונית */}
+                        <div className="flex items-center justify-between flex-row-reverse">
                           <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
                           <Switch
                             id={`vegan-cheese-${pizzaIndex}`}
@@ -350,82 +331,75 @@ export function PizzaCard({
                             onCheckedChange={(checked) => updatePizzaCheese(pizzaIndex, checked)}
                           />
                         </div>
-                      </div>
 
-                      <div className="mb-4">
-                        <label className="text-sm font-medium mb-2 block text-right">בחר פריסת תוספות</label>
-                        <Select
-                          value={pizzaConfig.layout}
-                          onValueChange={(value: ToppingLayout) => updatePizzaLayout(pizzaIndex, value)}
-                        >
-                          <SelectTrigger className="text-right">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent align="end">
-                            <SelectItem value="full" className="text-right">על כל הפיצה</SelectItem>
-                            <SelectItem value="half" className="text-right">חצי-חצי</SelectItem>
-                            <SelectItem value="quarter" className="text-right">רבעים</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <Tabs defaultValue="0" className="w-full">
-                        <TabsList className="w-full flex flex-row-reverse"> {/* Added flex-row-reverse */}
-                          {Array.from({ length: sections }, (_, i) => (
-                            <TabsTrigger key={i} value={i.toString()}>
-                              {pizzaConfig.layout === "full" ? "תוספות" :
-                                pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
-                                `רבע ${i + 1}`}
-                            </TabsTrigger>
-                          ))}
-                        </TabsList>
-
-                        {Array.from({ length: sections }, (_, sectionIndex) => (
-                          <TabsContent key={sectionIndex} value={sectionIndex.toString()}>
-                            <div className="grid grid-cols-2 gap-2">
-                              {toppings?.map(topping => {
-                                const isSelected = pizzaConfig.sections[sectionIndex]?.includes(topping.id);
-                                const canSelect = !isSelected && (!pizzaConfig.sections[sectionIndex] || pizzaConfig.sections[sectionIndex].length < 3);
-
-                                return (
-                                  <Button
-                                    key={topping.id}
-                                    variant={isSelected ? "secondary" : "outline"}
-                                    className="justify-end"
-                                    onClick={() => handleToppingToggle(sectionIndex, topping.id)}
-                                    disabled={!isSelected && !canSelect}
-                                  >
-                                    {topping.name} (₪{(topping.price / 100).toFixed(2)})
-                                    {isSelected && <CheckCircle2 className="w-4 h-4 ml-2" />}
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          </TabsContent>
-                        ))}
-                      </Tabs>
-
-                      <div className="mt-4 p-4 border rounded-lg">
-                        <div className="flex justify-between text-lg">
-                          <span>₪{(calculatePizzaPrice(pizzaConfig) / 100).toFixed(2)}</span>
-                          <span>:מחיר למגש</span>
+                        <div className="mb-4">
+                          <label className="text-sm font-medium mb-2 block text-right">בחר פריסת תוספות</label>
+                          <Select
+                            value={pizzaConfig.layout}
+                            onValueChange={(value: ToppingLayout) => updatePizzaLayout(pizzaIndex, value)}
+                          >
+                            <SelectTrigger className="text-right">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent align="end">
+                              <SelectItem value="full" className="text-right">על כל הפיצה</SelectItem>
+                              <SelectItem value="half" className="text-right">חצי-חצי</SelectItem>
+                              <SelectItem value="quarter" className="text-right">רבעים</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
+
+                        <Tabs defaultValue="0" className="w-full">
+                          <TabsList className="w-full flex flex-row-reverse">
+                            {Array.from({ length: sections }, (_, i) => (
+                              <TabsTrigger key={i} value={i.toString()}>
+                                {pizzaConfig.layout === "full" ? "תוספות" :
+                                  pizzaConfig.layout === "half" ? `חצי ${i + 1}` :
+                                    `רבע ${i + 1}`}
+                              </TabsTrigger>
+                            ))}
+                          </TabsList>
+
+                          {Array.from({ length: sections }, (_, sectionIndex) => (
+                            <TabsContent key={sectionIndex} value={sectionIndex.toString()}>
+                              <div className="grid grid-cols-2 gap-2">
+                                {toppings?.map(topping => {
+                                  const isSelected = pizzaConfig.sections[sectionIndex]?.includes(topping.id);
+                                  const canSelect = !isSelected && (!pizzaConfig.sections[sectionIndex] || pizzaConfig.sections[sectionIndex].length < 3);
+
+                                  return (
+                                    <Button
+                                      key={topping.id}
+                                      variant={isSelected ? "secondary" : "outline"}
+                                      className="justify-end"
+                                      onClick={() => handleToppingToggle(sectionIndex, topping.id)}
+                                      disabled={!isSelected && !canSelect}
+                                    >
+                                      {topping.name} (₪{(topping.price / 100).toFixed(2)})
+                                      {isSelected && <CheckCircle2 className="w-4 h-4 ml-2" />}
+                                    </Button>
+                                  );
+                                })}
+                              </div>
+                            </TabsContent>
+                          ))}
+                        </Tabs>
                       </div>
                     </TabsContent>
                   ))}
                 </Tabs>
-              </div>
 
-              <div className="mt-4 p-4 border rounded-lg">
-                <div className="flex justify-between text-lg font-bold">
-                  <span>₪{(calculateTotalPrice() / 100).toFixed(2)}</span>
-                  <span>:סה"כ לתשלום</span>
+                <div className="mt-4 p-4 border rounded-lg">
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>₪{(calculateTotalPrice() / 100).toFixed(2)}</span>
+                    <span>:סה"כ לתשלום</span>
+                  </div>
                 </div>
-              </div>
 
-              <Button onClick={handleAddToCart} className="w-full mt-4">
-                {existingItem ? "עדכן פריט" : "הוסף לסל"}
-              </Button>
+                <Button onClick={handleAddToCart} className="w-full">
+                  {existingItem ? "עדכן פריט" : "הוסף לסל"}
+                </Button>
+              </div>
             </DialogContent>
           </Dialog>
         )}
