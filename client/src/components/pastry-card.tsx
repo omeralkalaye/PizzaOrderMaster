@@ -204,7 +204,7 @@ export function PastryCard({ item }: PastryCardProps) {
                   </TabsList>
                   <TabsContent value={currentItemIndex.toString()}>
                     <div className="space-y-4">
-                      <Label className="block mb-2 text-right">הסר מרכיבים:</Label>
+                      <Label className="block mb-2 text-right" dir="rtl">הסר מרכיבים:</Label>
                       <div className="grid grid-cols-2 gap-2">
                         {getAvailableIngredients().map((ingredient) => (
                           <div key={ingredient} className="flex items-center justify-between p-2 border rounded">
