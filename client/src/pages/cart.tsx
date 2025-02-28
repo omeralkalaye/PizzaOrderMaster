@@ -20,19 +20,7 @@ const orderSchema = z.object({
   customerName: z.string().min(2, "נא להזין שם מלא"),
   phone: z.string().min(10, "נא להזין מספר טלפון תקין"),
   address: z.string().optional(),
-}).refine(
-  (data) => {
-    // בדיקה שהכתובת הוזנה אם זה משלוח
-    if (window.deliveryType === "delivery") {
-      return data.address && data.address.length >= 5;
-    }
-    return true;
-  },
-  {
-    message: "נא להזין כתובת מלאה למשלוח",
-    path: ["address"],
-  }
-);
+});
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
@@ -120,6 +108,16 @@ export default function Cart() {
       toast({
         title: "הסל ריק",
         description: "נא להוסיף פריטים לסל לפני ביצוע ההזמנה.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // בדיקת כתובת למשלוח
+    if (deliveryType === "delivery" && (!data.address || data.address.length < 5)) {
+      toast({
+        title: "כתובת חסרה",
+        description: "נא להזין כתובת מלאה למשלוח",
         variant: "destructive",
       });
       return;

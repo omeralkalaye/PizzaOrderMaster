@@ -20,7 +20,8 @@ type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
   | { type: "REMOVE_ITEM"; payload: number }
   | { type: "UPDATE_QUANTITY"; payload: { pizzaId: number; quantity: number } }
-  | { type: "CLEAR" };
+  | { type: "CLEAR" }
+  | { type: "CLEAR_CART" };  // הוספת פעולה חדשה לריקון הסל
 
 const CartContext = createContext<{
   state: CartState;
@@ -81,6 +82,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       };
     }
     case "CLEAR":
+    case "CLEAR_CART":
       return { items: [] };
     default:
       return state;

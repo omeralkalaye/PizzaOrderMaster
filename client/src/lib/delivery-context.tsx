@@ -1,4 +1,5 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
+import { useCart } from './cart';
 
 type DeliveryType = 'delivery' | 'pickup';
 
@@ -11,7 +12,16 @@ interface DeliveryContextType {
 const DeliveryContext = createContext<DeliveryContextType | null>(null);
 
 export function DeliveryProvider({ children }: { children: ReactNode }) {
-  const [deliveryType, setDeliveryType] = useState<DeliveryType>('pickup');
+  const [deliveryType, setDeliveryTypeState] = useState<DeliveryType>('pickup');
+  const { dispatch } = useCart();
+
+  const setDeliveryType = (type: DeliveryType) => {
+    if (type !== deliveryType) {
+      // אם סוג המשלוח השתנה, נאפס את הסל
+      dispatch({ type: "CLEAR_CART" });
+      setDeliveryTypeState(type);
+    }
+  };
 
   const getPriceMultiplier = () => {
     return deliveryType === 'delivery' ? 1.1 : 1; // 10% תוספת למשלוח

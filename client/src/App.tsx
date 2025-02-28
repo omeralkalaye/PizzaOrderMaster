@@ -42,13 +42,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <DeliveryProvider>
-          <CartProvider>
+        <CartProvider>
+          <DeliveryProvider>
             <Nav />
             <Router />
             <Toaster />
-          </CartProvider>
-        </DeliveryProvider>
+          </DeliveryProvider>
+        </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
