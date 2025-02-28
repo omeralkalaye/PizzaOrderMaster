@@ -3,16 +3,104 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-export type PizzaSize = "S" | "M" | "L" | "XL";
+// מידות עבור פריטים שונים
+export type ItemSize = "S" | "M" | "L" | "XL";
 export type DeliveryType = "delivery" | "pickup";
 export type ToppingLayout = "full" | "half" | "quarter";
 
-export const pizzaSizes = {
+export const itemSizes = {
   S: { name: "S", priceMultiplier: 1 },
   M: { name: "M", priceMultiplier: 1.2 },
   L: { name: "L", priceMultiplier: 1.4 },
   XL: { name: "XL", priceMultiplier: 1.6 }
 };
+
+// קטגוריות תפריט
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  order: integer("order").notNull().default(0),
+});
+
+// פריטי תפריט (כולל פיצות, מלוואח, פסטות וכו')
+export const menuItems = pgTable("menu_items", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").notNull().references(() => categories.id),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(), // מחיר בסיס באגורות
+  imageUrl: text("image_url"),
+  available: boolean("available").notNull().default(true),
+  allowsToppings: boolean("allows_toppings").notNull().default(false),
+  allowsSizes: boolean("allows_sizes").notNull().default(false),
+  allowsSauces: boolean("allows_sauces").notNull().default(false),
+  isCustomizable: boolean("is_customizable").notNull().default(false),
+});
+
+// תוספות (לפיצות, סלטים, פסטות)
+export const toppings = pgTable("toppings", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  price: integer("price").notNull(),
+  imageUrl: text("image_url"),
+  available: boolean("available").notNull().default(true),
+  categoryId: integer("category_id").references(() => categories.id), // לאיזה קטגוריות התוספת מתאימה
+});
+
+// רטבים (לפסטות, סלטים)
+export const sauces = pgTable("sauces", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  price: integer("price").notNull(),
+  available: boolean("available").notNull().default(true),
+});
+
+// משקאות
+export const beverages = pgTable("beverages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  price: integer("price").notNull(),
+  imageUrl: text("image_url"),
+  available: boolean("available").notNull().default(true),
+  size: text("size"), // גודל בליטרים או מ"ל
+});
+
+// Relations
+export const menuItemsRelations = relations(menuItems, ({ one }) => ({
+  category: one(categories, {
+    fields: [menuItems.categoryId],
+    references: [categories.id],
+  }),
+}));
+
+export const toppingsRelations = relations(toppings, ({ one }) => ({
+  category: one(categories, {
+    fields: [toppings.categoryId],
+    references: [categories.id],
+  }),
+}));
+
+// Insert schemas
+export const insertCategorySchema = createInsertSchema(categories).omit({ id: true });
+export const insertMenuItemSchema = createInsertSchema(menuItems).omit({ id: true });
+export const insertToppingSchema = createInsertSchema(toppings).omit({ id: true });
+export const insertSauceSchema = createInsertSchema(sauces).omit({ id: true });
+export const insertBeverageSchema = createInsertSchema(beverages).omit({ id: true });
+
+// Types
+export type Category = typeof categories.$inferSelect;
+export type InsertCategory = z.infer<typeof insertCategorySchema>;
+export type MenuItem = typeof menuItems.$inferSelect;
+export type InsertMenuItem = z.infer<typeof insertMenuItemSchema>;
+export type Topping = typeof toppings.$inferSelect;
+export type InsertTopping = z.infer<typeof insertToppingSchema>;
+export type Sauce = typeof sauces.$inferSelect;
+export type InsertSauce = z.infer<typeof insertSauceSchema>;
+export type Beverage = typeof beverages.$inferSelect;
+export type InsertBeverage = z.infer<typeof insertBeverageSchema>;
 
 // User schema
 export const users = pgTable("users", {
@@ -36,22 +124,6 @@ export const paymentMethods = pgTable("payment_methods", {
   isDefault: boolean("is_default").notNull().default(false),
 });
 
-export const pizzas = pgTable("pizzas", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  price: integer("price").notNull(), // Base price in cents
-  imageUrl: text("image_url").notNull(),
-  available: boolean("available").notNull().default(true),
-});
-
-export const toppings = pgTable("toppings", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  price: integer("price").notNull(), // Additional price in cents
-  imageUrl: text("image_url"),
-  available: boolean("available").notNull().default(true),
-});
 
 export type OrderStatus = "pending" | "preparing" | "ready" | "delivered";
 
@@ -107,7 +179,7 @@ export const paymentMethodsRelations = relations(paymentMethods, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertPizzaSchema = createInsertSchema(pizzas).omit({ id: true });
+export const insertPizzaSchema = createInsertSchema(menuItems).omit({ id: true });
 export const insertToppingSchema = createInsertSchema(toppings).omit({ id: true });
 export const insertOrderSchema = createInsertSchema(orders)
   .omit({ id: true, createdAt: true })
@@ -141,7 +213,7 @@ export const insertPaymentMethodSchema = createInsertSchema(paymentMethods)
   });
 
 // Types
-export type Pizza = typeof pizzas.$inferSelect;
+export type Pizza = typeof menuItems.$inferSelect;
 export type InsertPizza = z.infer<typeof insertPizzaSchema>;
 export type Topping = typeof toppings.$inferSelect;
 export type InsertTopping = z.infer<typeof insertToppingSchema>;

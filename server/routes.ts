@@ -1,39 +1,22 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema, insertPizzaSchema } from "@shared/schema";
+import { insertMenuItemSchema, insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Pizza routes
-  app.get("/api/pizzas", async (_req, res) => {
-    const pizzas = await storage.getPizzas();
-    res.json(pizzas);
-  });
-
-  app.get("/api/pizzas/:id", async (req, res) => {
-    const pizza = await storage.getPizza(Number(req.params.id));
-    if (!pizza) return res.status(404).json({ message: "פיצה לא נמצאה" });
-    res.json(pizza);
-  });
-
-  app.post("/api/pizzas", async (req, res) => {
-    const result = insertPizzaSchema.safeParse(req.body);
-    if (!result.success) {
-      return res.status(400).json({ message: "נתוני פיצה לא תקינים" });
+  // Menu routes
+  app.get("/api/menu", async (_req, res) => {
+    try {
+      const [categories, menuItems] = await Promise.all([
+        storage.getCategories(),
+        storage.getMenuItems()
+      ]);
+      res.json({ categories, menuItems });
+    } catch (error) {
+      console.error("Error fetching menu:", error);
+      res.status(500).json({ message: "שגיאה בטעינת התפריט" });
     }
-    const pizza = await storage.createPizza(result.data);
-    res.status(201).json(pizza);
-  });
-
-  app.patch("/api/pizzas/:id", async (req, res) => {
-    const result = insertPizzaSchema.partial().safeParse(req.body);
-    if (!result.success) {
-      return res.status(400).json({ message: "נתוני פיצה לא תקינים" });
-    }
-    const pizza = await storage.updatePizza(Number(req.params.id), result.data);
-    if (!pizza) return res.status(404).json({ message: "פיצה לא נמצאה" });
-    res.json(pizza);
   });
 
   // Topping routes

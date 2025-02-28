@@ -1,11 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { PizzaCard } from "@/components/pizza-card";
-import { Pizza, pizzaSizes } from "@shared/schema";
+import { Category, MenuItem } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type MenuData = {
+  categories: Category[];
+  menuItems: MenuItem[];
+}
+
 export default function Menu() {
-  const { data: pizzas, isLoading } = useQuery<Pizza[]>({
-    queryKey: ["/api/pizzas"],
+  const { data, isLoading } = useQuery<MenuData>({
+    queryKey: ["/api/menu"],
   });
 
   if (isLoading) {
@@ -24,28 +29,54 @@ export default function Menu() {
     );
   }
 
-  const basePizza = pizzas?.[0];
-
-  if (!basePizza) {
-    return null;
+  if (!data?.categories || !data?.menuItems) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <p>לא נמצאו פריטים בתפריט</p>
+      </div>
+    );
   }
+
+  const itemsByCategory = data.menuItems.reduce((acc, item) => {
+    const categoryId = item.categoryId;
+    if (!acc[categoryId]) {
+      acc[categoryId] = [];
+    }
+    acc[categoryId].push(item);
+    return acc;
+  }, {} as Record<number, MenuItem[]>);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">התפריט שלנו</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Object.entries(pizzaSizes).map(([size, { name, priceMultiplier }]) => (
-          <PizzaCard 
-            key={size} 
-            pizza={{
-              ...basePizza,
-              name: `פיצה ${name}`,
-              price: Math.round(basePizza.price * priceMultiplier)
-            }}
-            defaultSize={size as "S" | "M" | "L" | "XL"}
-          />
-        ))}
-      </div>
+      {data.categories
+        .sort((a, b) => a.order - b.order)
+        .map((category) => {
+          const items = itemsByCategory[category.id] || [];
+          if (items.length === 0) return null;
+
+          return (
+            <div key={category.id} className="mb-12">
+              <h2 className="text-2xl font-semibold mb-6">{category.name}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {items.map((item) => (
+                  <PizzaCard
+                    key={item.id}
+                    pizza={{
+                      ...item,
+                      name: item.name,
+                      description: item.description,
+                      price: item.price,
+                      imageUrl: item.imageUrl || "",
+                      available: item.available,
+                    }}
+                    defaultSize={item.allowsSizes ? "M" : undefined}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
     </div>
   );
 }

@@ -4,12 +4,13 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import {
   users,
-  pizzas,
+  categories,
+  menuItems,
   toppings,
   orders,
   paymentMethods,
-  type Pizza,
-  type InsertPizza,
+  type Category,
+  type MenuItem,
   type Order,
   type InsertOrder,
   type Topping,
@@ -24,16 +25,14 @@ import {
 const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
+  // Menu operations
+  getCategories(): Promise<Category[]>;
+  getMenuItems(): Promise<MenuItem[]>;
+
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-
-  // Pizza operations
-  getPizzas(): Promise<Pizza[]>;
-  getPizza(id: number): Promise<Pizza | undefined>;
-  createPizza(pizza: InsertPizza): Promise<Pizza>;
-  updatePizza(id: number, pizza: Partial<InsertPizza>): Promise<Pizza | undefined>;
 
   // Topping operations
   getToppings(): Promise<Topping[]>;
@@ -65,6 +64,15 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
+  // Menu operations
+  async getCategories(): Promise<Category[]> {
+    return db.select().from(categories);
+  }
+
+  async getMenuItems(): Promise<MenuItem[]> {
+    return db.select().from(menuItems);
+  }
+
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -79,30 +87,6 @@ export class DatabaseStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     const [newUser] = await db.insert(users).values(user).returning();
     return newUser;
-  }
-
-  // Pizza operations
-  async getPizzas(): Promise<Pizza[]> {
-    return db.select().from(pizzas);
-  }
-
-  async getPizza(id: number): Promise<Pizza | undefined> {
-    const [pizza] = await db.select().from(pizzas).where(eq(pizzas.id, id));
-    return pizza;
-  }
-
-  async createPizza(pizza: InsertPizza): Promise<Pizza> {
-    const [newPizza] = await db.insert(pizzas).values(pizza).returning();
-    return newPizza;
-  }
-
-  async updatePizza(id: number, pizza: Partial<InsertPizza>): Promise<Pizza | undefined> {
-    const [updatedPizza] = await db
-      .update(pizzas)
-      .set(pizza)
-      .where(eq(pizzas.id, id))
-      .returning();
-    return updatedPizza;
   }
 
   // Topping operations
