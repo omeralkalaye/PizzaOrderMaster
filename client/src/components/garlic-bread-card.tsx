@@ -30,40 +30,58 @@ interface GarlicBreadCardProps {
 export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProps) {
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [withCream, setWithCream] = useState(false);
+  const [gratinChoices, setGratinChoices] = useState<boolean[]>([false]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const updateQuantity = (newQuantity: number) => {
     const validQuantity = Math.max(1, newQuantity);
     setQuantity(validQuantity);
+    setGratinChoices(prev => {
+      if (validQuantity > prev.length) {
+        return [...prev, ...Array(validQuantity - prev.length).fill(false)];
+      }
+      return prev.slice(0, validQuantity);
+    });
+  };
+
+  const toggleGratin = (index: number) => {
+    setGratinChoices(prev => {
+      const newChoices = [...prev];
+      newChoices[index] = !newChoices[index];
+      return newChoices;
+    });
   };
 
   const calculateTotalPrice = () => {
     const basePrice = item.price;
-    const creamPrice = withCream ? CREAM_PRICE : 0;
-    return (basePrice + creamPrice) * quantity;
+    const gratinPrice = gratinChoices.reduce((total, isGratin) => 
+      total + (isGratin ? CREAM_PRICE : 0), 0);
+    return basePrice * quantity + gratinPrice;
   };
 
   const handleAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        pizzaId: item.id,
-        pizza: item,
-        size: defaultSize,
-        quantity: quantity,
-        toppingLayout: {
-          layout: "full",
-          sections: [[]]
+    // Add each bread as a separate item with its own gratin choice
+    gratinChoices.forEach((isGratin) => {
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          pizzaId: item.id,
+          pizza: item,
+          size: defaultSize,
+          quantity: 1,
+          toppingLayout: {
+            layout: "full",
+            sections: [[]]
+          },
+          isCreamSauce: false,
+          isVeganCheese: false,
+          isGratin,
         },
-        isCreamSauce: false,
-        isVeganCheese: false,
-        isGratin: withCream,
-      },
+      });
     });
     setIsDialogOpen(false);
     setQuantity(1);
-    setWithCream(false);
+    setGratinChoices([false]);
   };
 
   return (
@@ -79,7 +97,7 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
       <CardContent>
         <div className="aspect-video relative rounded-md overflow-hidden mb-4">
           <img
-            src={item.imageUrl}
+            src={item.imageUrl || ""}
             alt={item.name}
             className="object-cover w-full h-full"
           />
@@ -118,12 +136,17 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
                 <Label>כמות</Label>
               </div>
 
-              <div className="flex items-center justify-between">
-                <Switch
-                  checked={withCream}
-                  onCheckedChange={setWithCream}
-                />
-                <Label>הקרמה (+ ₪3)</Label>
+              <div className="space-y-4">
+                <Label className="block text-right mb-2">בחירת הקרמה:</Label>
+                {gratinChoices.map((isGratin, index) => (
+                  <div key={index} className="flex items-center justify-between border p-3 rounded-lg">
+                    <Switch
+                      checked={isGratin}
+                      onCheckedChange={() => toggleGratin(index)}
+                    />
+                    <Label>לחם שום {index + 1} - הקרמה (+ ₪3)</Label>
+                  </div>
+                ))}
               </div>
 
               <div className="mt-4 p-4 border rounded-lg">
