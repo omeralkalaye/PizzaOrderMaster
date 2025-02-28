@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { useDelivery } from "@/lib/delivery-context";
 import { useState } from "react";
 import {
   Dialog,
@@ -29,6 +30,7 @@ interface GarlicBreadCardProps {
 
 export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProps) {
   const { dispatch } = useCart();
+  const { deliveryType, getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(1);
   const [gratinChoices, setGratinChoices] = useState<boolean[]>([false]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -53,7 +55,7 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
   };
 
   const calculateTotalPrice = () => {
-    const basePrice = item.price;
+    const basePrice = item.price * getPriceMultiplier();
     const gratinPrice = gratinChoices.reduce((total, isGratin) =>
       total + (isGratin ? CREAM_PRICE : 0), 0);
     return basePrice * quantity + gratinPrice;
@@ -91,7 +93,8 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
         <CardTitle className="flex justify-between items-center text-center">
           <span>{item.name}</span>
           <span className="text-lg">
-            ₪{(item.price / 100).toFixed(2)}
+            ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
+            {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
           </span>
         </CardTitle>
       </CardHeader>

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { useDelivery } from "@/lib/delivery-context";
 import { useState } from "react";
 import {
   Dialog,
@@ -49,6 +50,7 @@ export function PizzaCard({
   onUpdate
 }: PizzaCardProps) {
   const { dispatch } = useCart();
+  const { deliveryType, getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(existingItem?.quantity || 1);
   const [currentPizzaIndex, setCurrentPizzaIndex] = useState(0);
   const [selectedPizzas, setSelectedPizzas] = useState<Array<{
@@ -160,7 +162,7 @@ export function PizzaCard({
   };
 
   const calculatePizzaPrice = (pizzaConfig: typeof selectedPizzas[0]) => {
-    const basePrice = pizza.price;
+    const basePrice = pizza.price * getPriceMultiplier();
     const saucePrice = pizzaConfig.isCreamSauce ? 500 : 0;
     const toppingsPrice = pizzaConfig.sections.flat().reduce((total, toppingId) => {
       const topping = toppings?.find(t => t.id === toppingId);
@@ -177,7 +179,6 @@ export function PizzaCard({
 
   const handleAddToCart = () => {
     if (existingItem && onUpdate) {
-      // Update existing item while preserving its properties
       onUpdate({
         ...existingItem,
         quantity,
@@ -196,7 +197,6 @@ export function PizzaCard({
         isVeganCheese: selectedPizzas[currentPizzaIndex].isVeganCheese,
       });
     } else {
-      // Add each pizza configuration as a separate item
       selectedPizzas.forEach((pizzaConfig) => {
         dispatch({
           type: "ADD_ITEM",
@@ -204,7 +204,7 @@ export function PizzaCard({
             pizzaId: pizza.id,
             pizza,
             size: defaultSize,
-            quantity: 1, // Each configuration gets quantity of 1
+            quantity: 1, 
             toppingLayout: {
               layout: pizzaConfig.layout,
               sections: pizzaConfig.sections
@@ -237,7 +237,8 @@ export function PizzaCard({
         <CardTitle className="flex justify-between items-center text-center">
           <span>{pizza.name}</span>
           <span className="text-lg">
-            ₪{(pizza.price / 100).toFixed(2)}
+            ₪{(pizza.price * getPriceMultiplier() / 100).toFixed(2)}
+            {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
           </span>
         </CardTitle>
       </CardHeader>
@@ -262,7 +263,6 @@ export function PizzaCard({
             </DialogHeader>
 
             <div className="space-y-6">
-              {/* כמות מגשים */}
               <div className="flex items-center justify-between flex-row-reverse">
                 <Label>כמות מגשים</Label>
                 <div className="flex items-center space-x-2">
@@ -296,7 +296,6 @@ export function PizzaCard({
                 {selectedPizzas.map((pizzaConfig, pizzaIndex) => (
                   <TabsContent key={pizzaIndex} value={pizzaIndex.toString()}>
                     <div className="space-y-4">
-                      {/* בצק דק */}
                       <div className="flex items-center justify-between flex-row-reverse">
                         <Label htmlFor={`thin-dough-${pizzaIndex}`}>בצק דק</Label>
                         <Switch
@@ -306,7 +305,6 @@ export function PizzaCard({
                         />
                       </div>
 
-                      {/* רוטב שמנת */}
                       <div className="flex items-center justify-between flex-row-reverse">
                         <Label htmlFor={`cream-sauce-${pizzaIndex}`}>רוטב שמנת (+ ₪5)</Label>
                         <Switch
@@ -316,7 +314,6 @@ export function PizzaCard({
                         />
                       </div>
 
-                      {/* גבינה טבעונית */}
                       <div className="flex items-center justify-between flex-row-reverse">
                         <Label htmlFor={`vegan-cheese-${pizzaIndex}`}>גבינה טבעונית</Label>
                         <Switch

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { useDelivery } from "@/lib/delivery-context";
 import { useState } from "react";
 import {
   Dialog,
@@ -46,6 +47,7 @@ interface PastaCardProps {
 
 export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
   const { dispatch } = useCart();
+  const { deliveryType, getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(1);
   const [sauceChoices, setSauceChoices] = useState<string[]>(["cream"]);
   const [parmesanChoices, setParmesanChoices] = useState<boolean[]>([false]);
@@ -85,7 +87,7 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
   };
 
   const calculateTotalPrice = () => {
-    const basePrice = item.price;
+    const basePrice = item.price * getPriceMultiplier();
     const parmesanPrice = parmesanChoices.reduce((total, hasParmesan) =>
       total + (hasParmesan ? PARMESAN_PRICE : 0),
       0
@@ -123,7 +125,8 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
         <CardTitle className="flex justify-between items-center text-center">
           <span>{item.name}</span>
           <span className="text-lg">
-            ₪{(item.price / 100).toFixed(2)}
+            ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
+            {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
           </span>
         </CardTitle>
       </CardHeader>
@@ -199,7 +202,9 @@ export function PastaCard({ item, defaultSize = "M" }: PastaCardProps) {
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-between flex-row-reverse">
-                        <Label htmlFor={`parmesan-${index}`}>אקסטרא פרמז'ן (+ ₪3)</Label>
+                        <Label htmlFor={`parmesan-${index}`}>
+                          אקסטרא פרמז'ן (+ ₪3)
+                        </Label>
                         <Switch
                           id={`parmesan-${index}`}
                           checked={parmesanChoices[index]}

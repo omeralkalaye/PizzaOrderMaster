@@ -47,6 +47,25 @@ interface DrinkSelection {
   size: "small" | "large";
 }
 
+const ButtonComponent = ({ deliveryType, total }: { deliveryType: string; total: number }) => {
+  const isDisabled = deliveryType === "delivery" && total < 5500;
+
+  return (
+    <Button
+      type="submit"
+      className="w-full"
+      disabled={isDisabled}
+    >
+      {isDisabled ? (
+        <>מינימום הזמנה למשלוח: ₪55</>
+      ) : (
+        <>מעבר לתשלום - ₪{(total / 100).toFixed(2)}</>
+      )}
+    </Button>
+  );
+};
+
+
 export default function Cart() {
   const { state: { items }, dispatch } = useCart();
   const { toast } = useToast();
@@ -402,9 +421,7 @@ export default function Cart() {
                   />
                 )}
 
-                <Button type="submit" className="w-full">
-                  מעבר לתשלום - ₪{(calculateFinalTotal() / 100).toFixed(2)}
-                </Button>
+                <ButtonComponent deliveryType={deliveryType} total={calculateFinalTotal()} />
               </form>
             </Form>
           </div>
