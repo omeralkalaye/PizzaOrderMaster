@@ -42,13 +42,11 @@ export function Nav() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               {/* לוגו */}
-              <div className="flex-shrink-0 flex items-center">
-                <Link href="/">
-                  <a>
-                    <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-12 w-auto" />
-                  </a>
-                </Link>
-              </div>
+              <Link href="/">
+                <a className="flex-shrink-0 flex items-center transition-transform hover:scale-105">
+                  <img src="/logo.png" alt="פיצה פצץ קדימה" className="h-14 w-auto" />
+                </a>
+              </Link>
               {/* כפתור חזרה */}
               {location !== "/" && (
                 <Button
