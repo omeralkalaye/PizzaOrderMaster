@@ -8,6 +8,7 @@ import { Nav } from "./components/nav";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Menu from "@/pages/menu";
+import PizzaMenu from "@/pages/pizza-menu";
 import Cart from "@/pages/cart";
 import Payment from "@/pages/payment";
 import Auth from "@/pages/auth";
@@ -19,6 +20,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/menu" component={Menu} />
+      <Route path="/pizza-menu" component={PizzaMenu} />
       <Route path="/cart" component={Cart} />
       <Route path="/payment" component={Payment} />
       <Route path="/auth" component={Auth} />
