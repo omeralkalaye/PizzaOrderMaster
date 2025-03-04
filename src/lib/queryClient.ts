@@ -1,10 +1,16 @@
 import { QueryClient } from "@tanstack/react-query";
+import { mockCategories, mockMenuItems } from "@/data/menu-data";
 
-// Simplified fetch wrapper for mock data
-export async function apiRequest<T>(url: string): Promise<T> {
-  // In a real app, this would make actual API calls
-  // For now, we'll return mock data
-  return Promise.resolve({} as T);
+// Mock API functions
+export async function fetchCategories() {
+  return mockCategories;
+}
+
+export async function fetchMenuItems(categoryId?: number) {
+  if (categoryId) {
+    return mockMenuItems.filter(item => item.categoryId === categoryId);
+  }
+  return mockMenuItems;
 }
 
 export const queryClient = new QueryClient({

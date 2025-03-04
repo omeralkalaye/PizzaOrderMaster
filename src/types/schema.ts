@@ -1,8 +1,10 @@
-// Local type definitions to replace @shared/schema
+// Local type definitions without backend dependencies
 export type Category = {
   id: number;
   name: string;
   order: number;
+  description?: string;
+  imageUrl?: string;
 };
 
 export type MenuItem = {
@@ -19,7 +21,11 @@ export type MenuItem = {
   isCustomizable: boolean;
 };
 
-export type Pizza = MenuItem;
+export type Pizza = MenuItem & {
+  isSpicy?: boolean;
+  isVegan?: boolean;
+};
+
 export type ItemSize = "small" | "medium" | "large";
 export type ToppingLayout = "full" | "left" | "right";
 export type DoughType = "regular" | "thin" | "thick";
