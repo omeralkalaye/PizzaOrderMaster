@@ -21,14 +21,23 @@ async function createViteServer() {
         clientPort: Number(process.env.PORT) || 5000,
         host: '0.0.0.0'
       },
-      allowedHosts: 'all' // Allow all external hosts
+      allowedHosts: ['all'] // Allow all external hosts
     },
     appType: 'spa',
     root: clientDir
   });
 
+  // Log Vite configuration for debugging
+  console.log('Vite server configuration:', {
+    port: Number(process.env.PORT) || 5000,
+    host: '0.0.0.0',
+    allowedHosts: ['all'],
+    root: clientDir
+  });
+
   // Use vite's connect instance as middleware
   app.use(vite.middlewares);
+  console.log('Vite middleware attached');
 
   const port = Number(process.env.PORT) || 5000;
   app.listen(port, '0.0.0.0', () => {
