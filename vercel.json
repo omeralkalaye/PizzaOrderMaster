@@ -1,6 +1,6 @@
 {
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  "framework": "vite",
+  "buildCommand": "vite build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist/public"
 }
