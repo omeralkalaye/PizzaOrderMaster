@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const clientDir = dirname(__dirname) + '/client';
+const clientDir = dirname(__dirname) + '/src';
 
 console.log('Starting Vite server with root:', clientDir);
 
@@ -15,16 +15,16 @@ async function createViteServer() {
   const vite = await createServer({
     server: { 
       middlewareMode: true,
-      port: 3000  // Try a different port
+      port: 8080
     },
     appType: 'spa',
-    root: clientDir  // Point to the client directory where our React app lives
+    root: clientDir
   });
 
   // Use vite's connect instance as middleware
   app.use(vite.middlewares);
 
-  const port = Number(process.env.PORT) || 3000;  // Change default port to 3000
+  const port = Number(process.env.PORT) || 8080;
   app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`);
   });
