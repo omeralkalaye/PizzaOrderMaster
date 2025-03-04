@@ -1,6 +1,6 @@
 {
-  "buildCommand": "vite build",
-  "outputDirectory": "dist/public",
+  "buildCommand": "vite build && node copy-files.js",
+  "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
     {
