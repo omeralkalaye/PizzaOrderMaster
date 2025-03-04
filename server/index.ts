@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const clientDir = dirname(__dirname) + '/src';
+const clientDir = dirname(__dirname);
 
 console.log('Starting Vite server with root:', clientDir);
 
