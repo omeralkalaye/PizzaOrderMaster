@@ -17,3 +17,12 @@
     @apply text-right;
   }
 }
+
+/* RTL specific adjustments */
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
