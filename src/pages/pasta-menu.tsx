@@ -1,12 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { PastaCard } from "@/components/pasta-card";
-import { Category, MenuItem } from "@shared/schema";
+import { Category, MenuItem } from "@/types/schema";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type MenuData = {
-  categories: Category[];
-  menuItems: MenuItem[];
-}
 
 const PASTA_IMAGES = {
   "פסטה פנה": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
@@ -15,36 +10,9 @@ const PASTA_IMAGES = {
   "רביולי בטטה": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601",
 };
 
-export default function PastaMenu() {
-  const { data, isLoading } = useQuery<MenuData>({
-    queryKey: ["/api/menu"],
-  });
-
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="h-48 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!data?.categories || !data?.menuItems) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <p>לא נמצאו פריטים בתפריט</p>
-      </div>
-    );
-  }
-
-  const pastas = [
+const mockMenuData = {
+  categories: [],
+  menuItems: [
     {
       id: 101,
       name: "פסטה פנה",
@@ -97,7 +65,40 @@ export default function PastaMenu() {
       allowsSauces: false,
       isCustomizable: false,
     },
-  ];
+  ]
+};
+
+export default function PastaMenu() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["/api/menu"],
+    queryFn: () => Promise.resolve(mockMenuData),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data?.categories || !data?.menuItems) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <p>לא נמצאו פריטים בתפריט</p>
+      </div>
+    );
+  }
+
+  const pastas = data.menuItems;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

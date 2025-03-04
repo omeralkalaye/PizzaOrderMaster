@@ -1,12 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { PastryCard } from "@/components/pastry-card";
-import { Category, MenuItem } from "@shared/schema";
+import { Category, MenuItem } from "@/types/schema";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type MenuData = {
-  categories: Category[];
-  menuItems: MenuItem[];
-}
 
 const PASTRY_IMAGES = {
   "מלאווח פתוח": "https://images.unsplash.com/photo-1588951094912-19ed30d3f40c",
@@ -18,36 +13,14 @@ const PASTRY_IMAGES = {
   "ג'חנון": "https://images.unsplash.com/photo-1589367920963-d60e0ca6dcb9",
 };
 
-export default function PastriesMenu() {
-  const { data, isLoading } = useQuery<MenuData>({
-    queryKey: ["/api/menu"],
-  });
+type MenuData = {
+  categories: Category[];
+  menuItems: MenuItem[];
+};
 
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(7)].map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="h-48 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!data?.categories || !data?.menuItems) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <p>לא נמצאו פריטים בתפריט</p>
-      </div>
-    );
-  }
-
-  const pastries = [
+const mockMenuData = {
+  categories: [],
+  menuItems: [
     {
       id: 201,
       name: "מלאווח פתוח",
@@ -139,7 +112,40 @@ export default function PastriesMenu() {
       allowsSauces: false,
       isCustomizable: false,
     },
-  ];
+  ],
+};
+
+export default function PastriesMenu() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["/api/menu"],
+    queryFn: () => Promise.resolve(mockMenuData),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(7)].map((_, i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data?.categories || !data?.menuItems) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <p>לא נמצאו פריטים בתפריט</p>
+      </div>
+    );
+  }
+
+  const pastries = data.menuItems;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

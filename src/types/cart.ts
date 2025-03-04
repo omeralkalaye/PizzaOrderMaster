@@ -1,4 +1,4 @@
-import { Pizza, ItemSize, ToppingLayout, DoughType } from "@shared/schema";
+import { Pizza, ItemSize, ToppingLayout, DoughType } from "@/types/schema";
 
 export interface CartItem {
   pizzaId: number;

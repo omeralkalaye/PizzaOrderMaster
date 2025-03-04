@@ -1,15 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Category, MenuItem } from "@shared/schema";
+import { Category, MenuItem } from "@/types/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { BakedPotatoCard } from "@/components/baked-potato-card";
 import { SaladCard } from "@/components/salad-card";
-
-type MenuData = {
-  categories: Category[];
-  menuItems: MenuItem[];
-};
 
 const CATEGORY_IMAGES = {
   "פיצות": "https://images.unsplash.com/photo-1513104890138-7c749659a591",
@@ -31,10 +26,25 @@ const CATEGORY_DESCRIPTIONS = {
   "משקאות": "מבחר משקאות קרים",
 };
 
+const mockMenuData: { categories: Category[]; menuItems: MenuItem[] } = {
+  categories: [
+    { id: 1, name: "פיצות", order: 1 },
+    { id: 2, name: "לחם שום", order: 2 },
+    { id: 3, name: "פסטות", order: 3 },
+    { id: 4, name: "רביולי", order: 4 },
+    { id: 5, name: "תוספות חמות", order: 5 },
+    { id: 6, name: "סלטים", order: 6 },
+    { id: 7, name: "משקאות", order: 7 },
+  ],
+  menuItems: [], // Add your menu items here
+};
+
 export default function Menu() {
   const [, setLocation] = useLocation();
-  const { data, isLoading } = useQuery<MenuData>({
+
+  const { data, isLoading } = useQuery({
     queryKey: ["/api/menu"],
+    queryFn: () => Promise.resolve(mockMenuData),
   });
 
   if (isLoading) {
@@ -80,18 +90,19 @@ export default function Menu() {
             const items = itemsByCategory[category.id] || [];
             if (items.length === 0) return null;
 
-            const displayName = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
-            const imageKey = category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
+            const displayName =
+              category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
+            const imageKey =
+              category.name === "תוספות חמות" ? "תפוח אדמה מוקרם" : category.name;
 
-            // אם זה תפוח אדמה מוקרם או סלט, נציג את הכרטיסייה עם אפשרויות הבחירה
             const item = items[0];
             const image = CATEGORY_IMAGES[imageKey as keyof typeof CATEGORY_IMAGES] || "";
             const description = CATEGORY_DESCRIPTIONS[imageKey as keyof typeof CATEGORY_DESCRIPTIONS] || "";
 
             if (category.name === "תוספות חמות") {
               return (
-                <BakedPotatoCard 
-                  key={category.id} 
+                <BakedPotatoCard
+                  key={category.id}
                   item={{
                     ...item,
                     name: displayName,
@@ -104,8 +115,8 @@ export default function Menu() {
 
             if (category.name === "סלטים") {
               return (
-                <SaladCard 
-                  key={category.id} 
+                <SaladCard
+                  key={category.id}
                   item={{
                     ...item,
                     name: displayName,
