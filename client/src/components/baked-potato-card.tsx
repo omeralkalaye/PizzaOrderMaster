@@ -27,7 +27,7 @@ interface BakedPotatoCardProps {
 
 export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
   const { dispatch } = useCart();
-  const { deliveryType, getPriceMultiplier } = useDelivery();
+  const { getPriceMultiplier } = useDelivery();
   const [quantity, setQuantity] = useState(1);
   const [selectedToppings, setSelectedToppings] = useState<Array<number[]>>([[]]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -110,7 +110,6 @@ export function BakedPotatoCard({ item }: BakedPotatoCardProps) {
             <span>{item.name}</span>
             <span className="text-lg">
               ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
-              {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
             </span>
           </CardTitle>
         </CardHeader>

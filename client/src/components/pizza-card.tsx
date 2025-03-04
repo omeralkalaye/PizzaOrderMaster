@@ -204,7 +204,7 @@ export function PizzaCard({
             pizzaId: pizza.id,
             pizza,
             size: defaultSize,
-            quantity: 1, 
+            quantity: 1,
             toppingLayout: {
               layout: pizzaConfig.layout,
               sections: pizzaConfig.sections
@@ -238,7 +238,6 @@ export function PizzaCard({
           <span>{pizza.name}</span>
           <span className="text-lg">
             ₪{(pizza.price * getPriceMultiplier() / 100).toFixed(2)}
-            {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
           </span>
         </CardTitle>
       </CardHeader>

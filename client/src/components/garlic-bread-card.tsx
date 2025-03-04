@@ -94,7 +94,6 @@ export function GarlicBreadCard({ item, defaultSize = "M" }: GarlicBreadCardProp
           <span>{item.name}</span>
           <span className="text-lg">
             ₪{(item.price * getPriceMultiplier() / 100).toFixed(2)}
-            {deliveryType === 'delivery' && <span className="text-sm text-muted-foreground"> (כולל תוספת משלוח)</span>}
           </span>
         </CardTitle>
       </CardHeader>
